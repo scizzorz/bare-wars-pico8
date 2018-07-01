@@ -598,6 +598,8 @@ units = {}
 prev_state = nil
 state = s.command
 play_timer = 128
+num_players = 3
+cur_player = 0
 
 cam = _camera()
 curs = _sprite(anim_curs:copy(), 64, 64, pal_trans_red)
@@ -696,6 +698,17 @@ function jump_to_prev_unit()
   sfx(0)
 end
 
+-- move the cursor to the first unit owned by the cur_player
+function jump_to_first_owned()
+  for unit in all(units) do
+    if unit.owner == cur_player then
+      follow = unit
+      curs:move(unit.x, unit.y)
+      sfx(0)
+    end
+  end
+end
+
 -- change the state, recording the previous one as well
 function change_state(to)
   if type(to) == "string" then
@@ -714,7 +727,21 @@ function change_state(to)
   state = to
 end
 
+function next_turn()
+  cur_player += 1
+
+  if cur_player <= num_players then
+    change_state("command")
+    jump_to_first_owned()
+  else
+    cur_player = 0
+    play_timer = 128
+    change_state("play")
+  end
+end
+
 function _init()
+  next_turn()
 end
 
 function _update()
@@ -767,16 +794,13 @@ function _update()
       menu:clear()
 
       if state == s.command then
-        if follow ~= nil then
+        if follow ~= nil and follow.owner == cur_player then
           menu:add("move", function()
             change_state("move")
           end)
         end
 
-        menu:add("end turn", function()
-        change_state("play")
-        play_timer = 128
-      end)
+        menu:add("end turn", next_turn)
     end
 
       if #menu.labels > 0 then
@@ -854,7 +878,7 @@ function _update()
     play_timer -= 1
     play_meter:fill(play_timer)
     if play_timer == 0 then
-      change_state("command")
+      next_turn()
     end
   end
 
