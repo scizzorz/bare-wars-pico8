@@ -87,7 +87,6 @@ function object:isa(class)
 end
 
 -- camera object
-
 local _camera = object:extend()
 
 function _camera:init()
@@ -121,7 +120,6 @@ function _camera:draw()
 end
 
 -- sprite object
-
 local _sprite = object:extend()
 
 function _sprite:init(tile, x, y, transparent)
@@ -148,17 +146,26 @@ function _sprite:dmove(dx, dy)
   self.y += dy
 end
 
+-- button enum
+local b = {left=0, right=1, up=2, down=3, o=4, x=5}
+local c = {
+  black=0, darkblue=1, darkpurple=2, darkgreen=3,
+  brown=4, darkgrey=5, lightgrey=6, white=7,
+  red=8, orange=9, yellow=10, green=11,
+  blue=12, indigo=13, pink=14, peach=15,
+}
+
 local ui = {}
 local units = {}
 
 local cam = _camera()
-local curs = _sprite(1, 64, 64, 8)
+local curs = _sprite(1, 64, 64, c.red)
 
 add(ui, curs)
 
-local bear1 = _sprite(5, 16, 16, 8)
-local bear2 = _sprite(37, 16 + 36 * 8, 24, 8)
-local bear3 = _sprite(21, 16 + 36 * 16, 32, 8)
+local bear1 = _sprite(5, 16, 16, c.red)
+local bear2 = _sprite(37, 16 + 36 * 8, 24, c.red)
+local bear3 = _sprite(21, 16 + 36 * 16, 32, c.red)
 
 add(units, bear1)
 add(units, bear2)
@@ -259,26 +266,26 @@ function _update()
     sprite:update()
   end
 
-  if btnp(0) then
-    if btns[4] then
+  if btnp(b.left) then
+    if btns[b.o] then
       jump_to_prev_unit()
     else
       curs:dmove(-8, 0)
     end
   end
-  if btnp(1) then
-    if btns[4] then
+  if btnp(b.right) then
+    if btns[b.o] then
       jump_to_next_unit()
     else
       curs:dmove(8, 0)
     end
   end
-  if btnp(2) then curs:dmove(0, -8) end
-  if btnp(3) then curs:dmove(0, 8) end
-  if not pbtns[4] and btns[4] then
+  if btnp(b.up) then curs:dmove(0, -8) end
+  if btnp(b.down) then curs:dmove(0, 8) end
+  if not pbtns[b.o] and btns[b.o] then
     jump_to_closest_unit()
   end
-  if btnp(5) then curs:dmove(-36 * 8, 0) end
+  if btnp(b.x) then curs:dmove(-36 * 8, 0) end
 end
 
 function _draw()
