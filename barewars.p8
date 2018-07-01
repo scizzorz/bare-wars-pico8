@@ -449,15 +449,18 @@ function _unit:init(owner, x, y, palette)
   self.step = 0
 end
 
-function _unit:consume()
+function _unit:consume(amt)
+  amt = amt or 1
   local owner = players[self.owner]
 
-  self.step += 1
-  if self.step == 8 then
-    self.step = 0
+  self.step += amt
+  while self.step >= 32 do
+    self.step -= 32
     if owner.food > 0 then
+      printh(self.owner .. ' consuming a food!')
       owner.food -= 1
     else
+      printh(self.owner .. ' starving!')
       self.health -= 1
     end
   end
@@ -465,6 +468,7 @@ end
 
 function _unit:update()
   self.__super.update(self)
+  self:consume()
 
   local path = self.path
   if path and #path > 0 then
@@ -479,7 +483,7 @@ function _unit:update()
       end
     end
 
-    if self.path and (self.x ~= self.tx  or self.y ~= self.ty) then
+    if self.x ~= self.tx  or self.y ~= self.ty then
       self:consume()
     end
 
@@ -500,7 +504,8 @@ function _unit:update()
     end
   end
 
-  if self.x == self.tx and self.y == self.ty and get_resources(self.ctx, self.cty) > 0 then
+  local res = get_resources(self.ctx, self.cty)
+  if self.x == self.tx and self.y == self.ty and res and res > 0 then
     self:consume()
     use_resource(self.ctx, self.cty, self.owner)
   end
@@ -783,9 +788,9 @@ players = {}
 for p=1,num_players do
   add(players, {
     race=p,
-    money=200,
-    materials=200,
-    food=200,
+    money=0,
+    materials=0,
+    food=20,
     units=1,
   })
 end
@@ -942,8 +947,10 @@ resources = {}
 
 -- return the resources left on a node, generating if necessary
 function get_resources(x, y)
+  local cell = mget(x, y)
+  local is_resource = fget(cell, f.food) or fget(cell, f.money) or fget(cell, f.material)
   local key = coord_key(x, y)
-  if resources[key] == nil then
+  if is_resource and resources[key] == nil then
     resources[key] = flr(rnd(128) + 64)
   end
 
@@ -951,18 +958,24 @@ function get_resources(x, y)
 end
 
 function use_resource(x, y, owner, amt)
-  amt = amt or 1
-  local new = get_resources(x, y) - amt
+  local res = get_resources(x, y)
+  amt = min(amt or 1, res)
+
+  local new = res - amt
   resources[coord_key(x, y)] = new
+
   local cell = mget(x, y)
   local player = players[owner]
 
   if fget(cell, f.food) then
     player.food += amt
+    printh('giving ' .. owner .. ' ' .. amt .. ' food')
   elseif fget(cell, f.money) then
     player.money += amt
+    printh('giving ' .. owner .. ' ' .. amt .. ' money')
   elseif fget(cell, f.material) then
     player.materials += amt
+    printh('giving ' .. owner .. ' ' .. amt .. ' mats')
   end
 
   if new == 0 then
@@ -1117,6 +1130,9 @@ function _update()
   if state == s.play then
     for unit in all(units) do
       unit:update()
+      if unit.health <= 0 then
+        del(units, unit)
+      end
     end
 
     play_timer -= 1
