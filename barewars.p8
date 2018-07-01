@@ -211,6 +211,18 @@ end
 function _camera:move(x, y)
   self.tx = x
   self.ty = y
+  if self.tx < 0 then
+    self.tx = 0
+  end
+  if self.tx > 896 then
+    self.tx = 896
+  end
+  if self.ty < 0 then
+    self.ty = 0
+  end
+  if self.ty > 384 then
+    self.ty = 384
+  end
 end
 
 function _camera:dmove(dx, dy)
@@ -749,11 +761,24 @@ function _update()
     end
   end
 
+  if curs.x < 0 then
+    curs.x = 0
+  end
+  if curs.x > 1008 then
+    curs.x = 1008
+  end
+  if curs.y < 0 then
+    curs.y = 0
+  end
+  if curs.y > 496 then
+    curs.y = 496
+  end
+
   cam:move(curs.x - 60, curs.y - 60)
   cam:update()
 
-  for sprite in all(units) do
-    sprite:update()
+  for unit in all(units) do
+    unit:update()
   end
 
   curs:update()
