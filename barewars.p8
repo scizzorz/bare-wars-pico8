@@ -675,19 +675,29 @@ function _info:draw()
   palt(c.black, false)
   palt(c.red, true)
 
-  local player = players[cur_player]
+  local player_id = cur_player
+  if follow ~= nil then
+    player_id = follow.owner
+  end
+
+  local player = players[player_id]
+  if player == nil then
+    return
+  end
+
   local player_colors = {c.red, c.blue, c.yellow, c.green, c.darkgrey, c.darkgrey, c.darkgrey, c.darkgrey}
   local left = self.x + cam.x
   local top = self.y + cam.y
-  local ui_start = cur_player
-  local ui_end = 15 - num_players + cur_player
+  local ui_start = player_id
+  local ui_end = 15 - num_players + player_id
   local ui_left = left + ui_start * 8
+  local ui_right = left + ui_end * 8 - 16
 
   for p=1, num_players do
     pal(c.pink, player_colors[p])
-    if p < cur_player then
+    if p < player_id then
       spr(t.ui_left_gem, left + 8 * (p - 1), top)
-    elseif p == cur_player then
+    elseif p == player_id then
       spr(t.ui_mid_gem, left + 8 * (p - 1), top)
     else
       local i = t.ui_left_gem
@@ -706,7 +716,7 @@ function _info:draw()
 
   rectfill(ui_left, top, left + ui_end * 8 + 7, top + 6, c.black)
 
-  if cur_player ~= num_players then
+  if player_id ~= num_players then
     spr(t.ui_left_nogem, left + ui_end * 8, top)
   end
 
@@ -734,31 +744,32 @@ function _info:draw()
   palt(c.black, false)
 
   -- draw focused map info
-  local show_followed = true
   local curs_x = flr(curs.x / 8)
   local curs_y = flr(curs.y / 8)
   local cell_n = mget(curs_x, curs_y)
+  local res = get_resources(curs_x, curs_y)
 
+  -- draw map resource info
   if fget(cell_n, f.food) then
-    spr(t.ui_food, ui_left + 4, top + 6)
-    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
-    show_followed = false
+    spr(t.ui_food, ui_right + 4, top + 6)
+  elseif fget(cell_n, f.material) then
+    spr(t.ui_material, ui_right + 4, top + 6)
+  elseif fget(cell_n, f.money) then
+    spr(t.ui_money, ui_right + 4, top + 6)
   end
 
-  if fget(cell_n, f.material) then
-    spr(t.ui_material, ui_left + 4, top + 6)
-    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
-    show_followed = false
-  end
-
-  if fget(cell_n, f.money) then
-    spr(t.ui_money, ui_left + 4, top + 6)
-    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
-    show_followed = false
+  if res then
+    local offx = 0
+    if res > 100 then
+      offx = -8
+    elseif res > 10 then
+      offx = -4
+    end
+    print(res, ui_right + offx, top + 7, c.white)
   end
 
   -- draw focused unit health
-  if show_followed and follow ~= nil then
+  if follow ~= nil then
     palt(c.red, false)
     palt(c.brown, true)
 
@@ -1164,7 +1175,7 @@ function _draw()
     sel_curs:draw()
   end
 
-  if state == s.menu or state == s.command or state == s.move then
+  if state == s.menu or state == s.command or state == s.move or state == s.play then
     player_ui:draw()
   end
 
