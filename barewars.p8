@@ -50,7 +50,7 @@ function object:extend(proto)
 
   -- copy meta values, since lua doesn't walk the prototype chain to find them
   for k, v in pairs(self) do
-    if sub(k, 1, 3) == "__" then
+    if sub(k, 1, 2) == "__" then
       proto[k] = v
     end
   end
