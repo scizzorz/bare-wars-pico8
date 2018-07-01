@@ -222,6 +222,7 @@ function _camera:update()
   if (self.x <= self.tx - 1) or (self.x >= self.tx + 1) then
     self.x = (self.x + self.tx) / 2
   end
+
   if (self.y <= self.ty - 1) or (self.y >= self.ty + 1) then
     self.y = (self.y + self.ty) / 2
   end
@@ -381,11 +382,17 @@ function _unit:init(x, y, palette)
 end
 
 function _unit:update()
+  self.__super.update(self)
+
   local path = self.path
   if path and #path > 0 then
     local to_coord = path[#path]
     if self.x == to_coord[1] * 8 and self.y == to_coord[2] * 8 then
-      pop(self.path)
+      pop(path)
+      if #path == 0 then
+        self.tile = anim_stand
+        self.path = nil
+      end
     else
       if self.x < to_coord[1] * 8 then
         self.x += 1
@@ -406,7 +413,6 @@ function _unit:update()
 end
 
 function _unit:draw()
-  self.__super.draw(self)
   local path = self.path
   if path and #path > 0 then
     line(self.x + 4, self.y + 4, path[#path][1] * 8 + 4, path[#path][2] * 8 + 4, c.yellow)
@@ -414,12 +420,20 @@ function _unit:draw()
       line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, c.yellow)
     end
   end
+
+  self.__super.draw(self)
 end
 
 function _unit:set_dest(tx, ty)
   self.tx = tx
   self.ty = ty
   self.path = self:get_path()
+  if #self.path > 0 then
+    printh("setting animation")
+    self.tile = anim_walk:copy()
+  else
+    self.path = nil
+  end
 end
 
 function _unit:get_path()
