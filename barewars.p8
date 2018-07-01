@@ -797,13 +797,16 @@ units = {}
 prev_state = nil
 state = s.command
 play_timer = 128
-num_players = 3
+num_players = 4
 cur_player = 0
 players = {}
 
 for p=1,num_players do
+  local race = flr(rnd(3) + 1)
+  local worker = _unit(p, flr(rnd(128)) * 8, flr(rnd(64)) * 8, races[race])
+  add(units, worker)
   add(players, {
-    race=p,
+    race=race,
     money=0,
     materials=0,
     food=20,
@@ -819,14 +822,6 @@ play_meter.y = 120
 player_ui = _info()
 menu = _menu()
 follow = nil
-
-bear1 = _unit(1, 16, 16, races[players[1].race])
-bear2 = _unit(2, 16 + 36 * 8, 24, races[players[2].race])
-bear3 = _unit(3, 16 + 36 * 16, 32, races[players[3].race])
-
-add(units, bear1)
-add(units, bear2)
-add(units, bear3)
 
 btns = {[0]=false, [1]=false, [2]=false, [3]=false, [4]=false, [5]=false}
 pbtns = btns
