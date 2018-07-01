@@ -163,6 +163,23 @@ add(units, bear1)
 add(units, bear2)
 add(units, bear3)
 
+-- move the cursor to the closest unit (by manhattan distance, because pythag overflows)
+function jump_to_closest_unit()
+  local closest_unit = units[1]
+  local closest_dist = mdst(units[1], curs)
+  for unit in all(units) do
+    local unit_dist = mdst(unit, curs)
+    if unit_dist < closest_dist then
+      closest_dist = unit_dist
+      closest_unit = unit
+    end
+  end
+  sfx(0)
+
+  curs.x = closest_unit.x
+  curs.y = closest_unit.y
+end
+
 function _init()
 end
 
@@ -183,19 +200,7 @@ function _update()
   if btnp(2) then curs:dmove(0, -8) end
   if btnp(3) then curs:dmove(0, 8) end
   if btnp(4) then
-    local closest_unit = units[1]
-    local closest_dist = mdst(units[1], curs)
-    for unit in all(units) do
-      local unit_dist = mdst(unit, curs)
-      if unit_dist < closest_dist then
-        closest_dist = unit_dist
-        closest_unit = unit
-      end
-    end
-    sfx(0)
-
-    curs.x = closest_unit.x
-    curs.y = closest_unit.y
+    jump_to_closest_unit()
   end
   if btnp(5) then curs:dmove(-36 * 8, 0) end
 end
@@ -299,4 +304,4 @@ __map__
 4040404040404040404040404040404044404040404040404040404040404040404040404060606060606060606060616060606060646060606060606060606060606060606060606050505050505050505050505050505050505050505050505050505050505050505050505000000000000000000000000000000000000000
 4040404040404040404040404040404040404040404040404040404040404040404040404060606060606060606060606060606060606060606060606060606060606060606060606050505050505050505050505050505050505050505050505050505050505050505050505000000000000000000000000000000000000000
 __sfx__
-00010000260500500030050300503005030040300403003030030300202d0003a6003a6002f00039600386000e0003860038600386002e0002d0002a00028000210001d000190001600013000000000000000000
+00010000260500500030050300503005030040300403003030030300202d0003a6003a6002f0003960038600386003860038600386002e0002d0002a00028000210001d000190001600013000000000000000000
