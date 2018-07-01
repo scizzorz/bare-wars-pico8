@@ -550,7 +550,7 @@ end
 -- meter class
 local _meter = object:extend()
 
-function _meter:init(cap, transparent, base, hi, lo)
+function _meter:init(cap, transparent, base, hi, lo, bg)
   self.x = 0
   self.y = 0
   self.width = 128
@@ -560,6 +560,7 @@ function _meter:init(cap, transparent, base, hi, lo)
   self.base = base or c.red
   self.hi = hi or c.pink
   self.lo = lo or c.indigo
+  self.bg = bg or c.darkblue
 end
 
 function _meter:fill(amt)
@@ -574,6 +575,7 @@ function _meter:draw()
   local top = self.y + cam.y
   local fill = self.amt / self.cap * (self.width - 4)
 
+  rectfill(left + 2, top + 2, left + 2 + self.width - 4, top + 6, self.bg)
   line(left + 2, top + 2, left + 2 + fill, top + 2, self.hi)
   line(left + 2, top + 3, left + 2 + fill, top + 3, self.base)
   line(left + 2, top + 4, left + 2 + fill, top + 4, self.base)
