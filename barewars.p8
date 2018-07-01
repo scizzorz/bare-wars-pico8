@@ -675,34 +675,42 @@ function _info:draw()
   palt(c.black, false)
   palt(c.red, true)
 
-  local player_id = cur_player
+  local player_num = cur_player
   if follow ~= nil then
-    player_id = follow.owner
+    player_num = follow.owner
   end
 
-  local player = players[player_id]
+  local player = players[player_num]
   if player == nil then
     return
+  end
+
+  local ui_slot = 1
+  for i=1, #order do
+    if order[i] == player_num then
+      ui_slot = i
+      break
+    end
   end
 
   local player_colors = {c.red, c.blue, c.yellow, c.green, c.darkgrey, c.darkgrey, c.darkgrey, c.darkgrey}
   local left = self.x + cam.x
   local top = self.y + cam.y
-  local ui_start = player_id
-  local ui_end = 16 - num_players + player_id
+  local ui_start = ui_slot
+  local ui_end = 16 - num_players + ui_slot
   local ui_left = left + ui_start * 8
   local ui_right = left + ui_end * 8 - 16
 
   for p=1, num_players do
     local border_col = c.darkgrey
-    if p == cur_player then
+    if order[p] == cur_player then
       border_col = c.lightgrey
     end
     pal(c.lightgrey, border_col)
-    pal(c.pink, player_colors[p])
-    if p < player_id then
+    pal(c.pink, player_colors[order[p]])
+    if p < ui_slot then
       spr(t.ui_left_gem, left + 8 * (p - 1), top)
-    elseif p == player_id then
+    elseif p == ui_slot then
       spr(t.ui_mid_gem, left + 8 * (p - 1), top)
     else
       local i = t.ui_left_gem
