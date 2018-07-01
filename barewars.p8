@@ -707,11 +707,11 @@ function _info:draw()
   local left = self.x + cam.x
   local top = self.y + cam.y
   local ui_start = ui_slot
-  local ui_end = 16 - num_players + ui_slot
+  local ui_end = 16 - #order + ui_slot
   local ui_left = left + ui_start * 8
   local ui_right = left + ui_end * 8 - 16
 
-  for p=1, num_players do
+  for p=1, #order do
     local border_col = c.darkgrey
     if order[p] == cur_player then
       border_col = c.lightgrey
@@ -724,10 +724,10 @@ function _info:draw()
       spr(t.ui_mid_gem, left + 8 * (p - 1), top)
     else
       local i = t.ui_left_gem
-      if p == num_players then
+      if p == #order then
         i = t.ui_mid_gem
       end
-      spr(i, left + 120 - (num_players) * 8 + 8 * p, top)
+      spr(i, left + 120 - (#order) * 8 + 8 * p, top)
     end
   end
 
@@ -820,7 +820,7 @@ cur_player = 0
 players = {}
 order = {}
 
-for p=1,num_players do
+for p=1, num_players do
   local race = flr(rnd(3) + 1)
   local worker = _unit(p, flr(rnd(128)) * 8, flr(rnd(64)) * 8, races[race])
   add(units, worker)
@@ -829,7 +829,7 @@ for p=1,num_players do
     race=race,
     money=0,
     materials=0,
-    food=20,
+    food=10 * p,
     units=1,
   })
 end
@@ -953,19 +953,30 @@ end
 function next_turn()
   turn_idx += 1
 
-  if turn_idx <= num_players then
-    change_state("command")
-    cur_player = order[turn_idx]
-    jump_to_first_owned()
-
+  for p=1, num_players do
     local owned = 0
     for unit in all(units) do
-      if unit.owner == cur_player then
+      if unit.owner == p then
         owned += 1
       end
     end
 
-    players[cur_player].units = owned
+    players[p].units = owned
+  end
+
+  for p in all(order) do
+    if players[p].units == 0 then
+      del(order, p)
+    end
+  end
+
+  -- move to next player
+  if turn_idx <= #order then
+    change_state("command")
+    cur_player = order[turn_idx]
+    jump_to_first_owned()
+
+  -- move to play mode
   else
     cur_player = nil
     turn_idx = 0
