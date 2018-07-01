@@ -19,6 +19,13 @@ local f = {
   material=3,
 }
 
+-- https://www.lexaloffle.com/bbs/?tid=3389
+function pop(stack)
+  local v = stack[#stack]
+  stack[#stack]=nil
+  return v
+end
+
 -- https://github.com/clowerweb/Lib-Pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
 function dst(o1, o2)
  return sqrt(sqr(o1.x - o2.x) + sqr(o1.y - o2.y))
@@ -98,19 +105,89 @@ end
 
 
 -- pathfinding
+-- https://www.lexaloffle.com/bbs/?tid=2570
 function get_neighbors(x, y)
+  dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
+  res = {}
+  for d in all(dirs) do
+    if check_cell(x + d[1], y + d[2]) then
+      add(res, {x + d[1], y + d[2]})
+    end
+  end
+
+  return res
+end
+
+function contains(t,v)
+  for k,val in pairs(t) do
+    if (val[1] == v[1] and val[2] == v[2]) then return true end
+  end
+
+  return false
 end
 
 function check_cell(x, y)
   if x < 128 and x >= 0 and y < 32 and y >= 0 then
     local n = mget(x, y)
     local is_solid = fget(n, f.solid)
-    if is_solid then
+    if not is_solid then
       return true
     end
   end
 
   return false
+end
+
+function coord_key(x, y)
+  if type(x) == "table" then
+    return x[1] .. "_" .. x[2]
+  end
+
+  return x .. "_" .. y
+end
+
+function get_path(fx, fy, tx, ty)
+  local path={}
+  local start={fx, fy}
+  local flood={start}
+  local camefrom={}
+
+  camefrom[coord_key(start)] = nil
+
+  while #flood > 0 do
+    local current = flood[1]
+
+    if (current[1] == tx and current[2] == ty) then break end
+    -- printh("examining " .. current[1] .. ", " .. current[2])
+
+    neighbs = get_neighbors(current[1], current[2])
+    -- printh("found " .. #neighbs .. " neighbors")
+
+    if #neighbs > 0 then
+      for neighb in all(neighbs) do
+        if camefrom[coord_key(neighb)] == nil and not contains(camefrom, neighb) then
+          add(flood,neighb)
+          camefrom[coord_key(neighb)] = current
+
+          -- awesome flood debugging
+          if debugflood then
+            rectfill(neighb[1]*8, neighb[2]*8, (neighb[1]*8)+7, (neighb[2]*8)+7)
+            flip()
+          end
+        end
+      end
+    end
+
+    del(flood,current)
+  end
+
+  local c = {tx, ty}
+  while camefrom[coord_key(c)] ~= nil do
+    add(path, c)
+    c = camefrom[coord_key(c)]
+  end
+
+  return path
 end
 
 
@@ -284,10 +361,49 @@ function _unit:init(x, y, palette)
   self.__super.init(self, 5, x, y, palette)
   self.tx = x
   self.ty = y
+  self.path = nil
+end
+
+function _unit:update()
+  local path = self.path
+  if path and #path > 0 then
+    local to_coord = path[#path]
+    if self.x == to_coord[1] * 8 and self.y == to_coord[2] * 8 then
+      pop(self.path)
+    else
+      if self.x < to_coord[1] * 8 then
+        self.x += 1
+        self.flipx = false
+      end
+      if self.x > to_coord[1] * 8 then
+        self.x -= 1
+        self.flipx = true
+      end
+      if self.y < to_coord[2] * 8 then
+        self.y += 1
+      end
+      if self.y > to_coord[2] * 8 then
+        self.y -= 1
+      end
+    end
+  end
 end
 
 function _unit:draw()
   self.__super.draw(self)
+  local path = self.path
+  if path and #path > 0 then
+    line(self.x + 4, self.y + 4, path[#path][1] * 8 + 4, path[#path][2] * 8 + 4, c.yellow)
+    for coord=1,#path-1 do
+      line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, c.yellow)
+    end
+  end
+end
+
+function _unit:set_dest(tx, ty)
+  self.tx = tx
+  self.ty = ty
+  self.path = self:get_path()
 end
 
 function _unit:get_path()
@@ -295,6 +411,7 @@ function _unit:get_path()
   local cur_y = flr(self.y / 8)
   local dest_x = flr(self.tx / 8)
   local dest_y = flr(self.ty / 8)
+  return get_path(cur_x, cur_y, dest_x, dest_y)
 end
 
 -- elements
@@ -313,6 +430,8 @@ local bear3 = _unit(16 + 36 * 16, 32, pal_race3)
 add(units, bear1)
 add(units, bear2)
 add(units, bear3)
+
+bear1:set_dest(8, 112)
 
 local btns = {[0]=false, [1]=false, [2]=false, [3]=false, [4]=false, [5]=false}
 local pbtns = btns
