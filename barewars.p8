@@ -127,12 +127,27 @@ function _sprite:init(tile, x, y, transparent)
   self.x = x
   self.y = y
   self.transparent = transparent or 8
+  self.flipx = false
+  self.flipy = false
+  self.w = 1
+  self.h = 1
+end
+
+function _sprite:update()
+  if self.anim then
+    self.anim:update()
+  end
 end
 
 function _sprite:draw()
   palt(self.transparent, true)
   palt(0, false)
-  spr(self.tile, self.x, self.y)
+
+  if self.anim then
+    self.tile = self.anim:frame()
+  end
+
+  spr(self.tile, self.x, self.y, self.w, self.h, self.flipx, self.flipy)
   palt()
 end
 
@@ -144,6 +159,55 @@ end
 function _sprite:dmove(dx, dy)
   self.x += dx
   self.y += dy
+end
+
+-- anim object
+local _anim = object:extend()
+
+function _anim:init(frames, speed, loop, reverse)
+  self.step = 0
+  self.cur = 1
+  self.frames = frames
+  self.loop = loop or true
+  self.reverse = reverse or false
+  self.speed = speed or 30
+end
+
+function _anim:next()
+  if self.reverse then
+    self.cur -= 1
+    if self.cur == 0 then
+      if self.loop then
+        self.cur = #self.frames
+      else
+        self.cur = 1
+      end
+    end
+  else
+    self.cur += 1
+    if self.cur == #self.frames + 1 then
+      if self.loop then
+        self.cur = 1
+      else
+        self.cur = #self.frames
+      end
+    end
+  end
+
+  return self.frames[self.cur]
+end
+
+function _anim:update()
+  self.step += 1
+  if self.step % flr(30 / self.speed) == 0 then
+    self:next()
+  end
+
+  return self.frames[self.cur]
+end
+
+function _anim:frame()
+  return self.frames[self.cur]
 end
 
 -- button enum
@@ -166,6 +230,8 @@ add(ui, curs)
 local bear1 = _sprite(5, 16, 16, c.red)
 local bear2 = _sprite(37, 16 + 36 * 8, 24, c.red)
 local bear3 = _sprite(21, 16 + 36 * 16, 32, c.red)
+
+bear1.anim = _anim({5, 6, 5, 7}, 10)
 
 add(units, bear1)
 add(units, bear2)
@@ -201,6 +267,31 @@ function jump_to_closest_unit()
   sfx(0)
 end
 
+-- move the cursor to the next unit (undefined behavior if no unit is under the cursor)
+function jump_to_next_unit()
+  local i = 0
+  for unit in all(units) do
+    local unit_dist = mdst(unit, curs)
+    i += 1
+
+    if unit_dist == 0 then
+      break
+    end
+  end
+
+  -- decide the next unit
+  local unit = units[i + 1]
+  if i == #units then
+    unit = units[1]
+  end
+
+  -- move cursor to unit
+  curs.x = unit.x
+  curs.y = unit.y
+  sfx(0)
+end
+
+-- move the cursor to the previous unit (undefined behavior if no unit is under the cursor)
 function jump_to_prev_unit()
   -- find the unit we're selecting
   local i = 0
@@ -217,29 +308,6 @@ function jump_to_prev_unit()
   local unit = units[i - 1]
   if i == 1 then
     unit = units[#units]
-  end
-
-  -- move cursor to unit
-  curs.x = unit.x
-  curs.y = unit.y
-  sfx(0)
-end
-
-function jump_to_next_unit()
-  local i = 0
-  for unit in all(units) do
-    local unit_dist = mdst(unit, curs)
-    i += 1
-
-    if unit_dist == 0 then
-      break
-    end
-  end
-
-  -- decide the next unit
-  local unit = units[i + 1]
-  if i == #units then
-    unit = units[1]
   end
 
   -- move cursor to unit
