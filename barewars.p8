@@ -88,7 +88,7 @@ end
 
 -- camera object
 
-_camera = object:extend()
+local _camera = object:extend()
 
 function _camera:init()
   self.x = 0
@@ -122,7 +122,7 @@ end
 
 -- sprite object
 
-_sprite = object:extend()
+local _sprite = object:extend()
 
 function _sprite:init(tile, x, y, transparent)
   self.tile = tile
@@ -148,42 +148,106 @@ function _sprite:dmove(dx, dy)
   self.y += dy
 end
 
-ui = {}
-cam = _camera()
-curs = _sprite(1, 64, 64, 8)
-units = {}
+local ui = {}
+local units = {}
 
-bear1 = _sprite(5, 16, 16, 8)
-bear2 = _sprite(37, 16 + 36 * 8, 24, 8)
-bear3 = _sprite(21, 16 + 36 * 16, 32, 8)
+local cam = _camera()
+local curs = _sprite(1, 64, 64, 8)
 
 add(ui, curs)
+
+local bear1 = _sprite(5, 16, 16, 8)
+local bear2 = _sprite(37, 16 + 36 * 8, 24, 8)
+local bear3 = _sprite(21, 16 + 36 * 16, 32, 8)
 
 add(units, bear1)
 add(units, bear2)
 add(units, bear3)
 
+local btns = {[0]=false, [1]=false, [2]=false, [3]=false, [4]=false, [5]=false}
+local pbtns = btns
+
 -- move the cursor to the closest unit (by manhattan distance, because pythag overflows)
 function jump_to_closest_unit()
   local closest_unit = units[1]
   local closest_dist = mdst(units[1], curs)
+
   for unit in all(units) do
     local unit_dist = mdst(unit, curs)
-    if unit_dist < closest_dist then
+
+    -- check if this unit is closer
+    if unit_dist < closest_dist or use_next then
       closest_dist = unit_dist
       closest_unit = unit
     end
-  end
-  sfx(0)
 
+    -- if we're currently selecting a unit, then move to the next instead
+    if closest_dist == 0 then
+      jump_to_next_unit()
+      return
+    end
+  end
+
+  -- move cursor to unit
   curs.x = closest_unit.x
   curs.y = closest_unit.y
+  sfx(0)
+end
+
+function jump_to_prev_unit()
+  -- find the unit we're selecting
+  local i = 0
+  for unit in all(units) do
+    local unit_dist = mdst(unit, curs)
+    i += 1
+
+    if unit_dist == 0 then
+      break
+    end
+  end
+
+  -- decide the previous unit
+  local unit = units[i - 1]
+  if i == 1 then
+    unit = units[#units]
+  end
+
+  -- move cursor to unit
+  curs.x = unit.x
+  curs.y = unit.y
+  sfx(0)
+end
+
+function jump_to_next_unit()
+  local i = 0
+  for unit in all(units) do
+    local unit_dist = mdst(unit, curs)
+    i += 1
+
+    if unit_dist == 0 then
+      break
+    end
+  end
+
+  -- decide the next unit
+  local unit = units[i + 1]
+  if i == #units then
+    unit = units[1]
+  end
+
+  -- move cursor to unit
+  curs.x = unit.x
+  curs.y = unit.y
+  sfx(0)
 end
 
 function _init()
 end
 
 function _update()
+  pbtns = btns
+  btns = {[0]=btn(0), [1]=btn(1), [2]=btn(2), [3]=btn(3), [4]=btn(4), [5]=btn(5)}
+
   cam:move(curs.x - 60, curs.y - 60)
   cam:update()
 
@@ -195,11 +259,23 @@ function _update()
     sprite:update()
   end
 
-  if btnp(0) then curs:dmove(-8, 0) end
-  if btnp(1) then curs:dmove(8, 0) end
+  if btnp(0) then
+    if btns[4] then
+      jump_to_prev_unit()
+    else
+      curs:dmove(-8, 0)
+    end
+  end
+  if btnp(1) then
+    if btns[4] then
+      jump_to_next_unit()
+    else
+      curs:dmove(8, 0)
+    end
+  end
   if btnp(2) then curs:dmove(0, -8) end
   if btnp(3) then curs:dmove(0, 8) end
-  if btnp(4) then
+  if not pbtns[4] and btns[4] then
     jump_to_closest_unit()
   end
   if btnp(5) then curs:dmove(-36 * 8, 0) end
