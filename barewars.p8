@@ -797,13 +797,16 @@ prev_state = nil
 state = s.command
 play_timer = 128
 num_players = 4
+turn_idx = 0
 cur_player = 0
 players = {}
+order = {}
 
 for p=1,num_players do
   local race = flr(rnd(3) + 1)
   local worker = _unit(p, flr(rnd(128)) * 8, flr(rnd(64)) * 8, races[race])
   add(units, worker)
+  add(order, p)
   add(players, {
     race=race,
     money=0,
@@ -930,13 +933,14 @@ end
 
 -- move to the next player, or start the play state
 function next_turn()
-  cur_player += 1
+  turn_idx += 1
 
-  if cur_player <= num_players then
+  if turn_idx <= num_players then
     change_state("command")
+    cur_player = order[turn_idx]
     jump_to_first_owned()
-    local owned = 0
 
+    local owned = 0
     for unit in all(units) do
       if unit.owner == cur_player then
         owned += 1
@@ -945,9 +949,16 @@ function next_turn()
 
     players[cur_player].units = owned
   else
-    cur_player = 0
+    cur_player = nil
+    turn_idx = 0
     play_timer = 128
     change_state("play")
+
+    local new_end = order[1]
+    for i=1, #order - 1 do
+      order[i] = order[i + 1]
+    end
+    order[#order] = new_end
   end
 end
 
