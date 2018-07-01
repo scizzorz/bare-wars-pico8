@@ -205,10 +205,11 @@ function get_path(fx, fy, tx, ty)
     local current = flood[1]
 
     if (current[1] == tx and current[2] == ty) then break end
-    -- printh("examining " .. current[1] .. ", " .. current[2])
 
     neighbs = get_neighbors(current[1], current[2])
-    -- printh("found " .. #neighbs .. " neighbors")
+    if mdst({x=current[1], y=current[2]}, {x=tx, y=ty}) == 1 then
+      add(neighbs, {tx, ty})
+    end
 
     if #neighbs > 0 then
       for neighb in all(neighbs) do
@@ -217,8 +218,8 @@ function get_path(fx, fy, tx, ty)
           camefrom[coord_key(neighb)] = current
 
           -- awesome flood debugging
-          if debugflood then
-            rectfill(neighb[1]*8, neighb[2]*8, (neighb[1]*8)+7, (neighb[2]*8)+7)
+          if false then
+            rectfill(neighb[1]*8, neighb[2]*8, (neighb[1]*8)+7, (neighb[2]*8)+7, c.blue)
             flip()
           end
         end
@@ -442,6 +443,8 @@ function _unit:init(owner, x, y, palette)
   self.owner = owner
   self.tx = x
   self.ty = y
+  self.ctx = flr(x / 8)
+  self.cty = flr(y / 8)
   self.path = nil
   self.step = 0
 end
@@ -496,6 +499,11 @@ function _unit:update()
       self.y -= 1
     end
   end
+
+  if self.x == self.tx and self.y == self.ty and get_resources(self.ctx, self.cty) > 0 then
+    self:consume()
+    use_resource(self.ctx, self.cty, self.owner)
+  end
 end
 
 function _unit:draw()
@@ -513,6 +521,8 @@ end
 function _unit:set_dest(tx, ty)
   self.tx = tx
   self.ty = ty
+  self.ctx = flr(tx / 8)
+  self.cty = flr(ty / 8)
   self.path = self:get_path()
   if #self.path > 0 then
     printh("setting animation")
@@ -525,9 +535,7 @@ end
 function _unit:get_path()
   local cur_x = flr(self.x / 8)
   local cur_y = flr(self.y / 8)
-  local dest_x = flr(self.tx / 8)
-  local dest_y = flr(self.ty / 8)
-  return get_path(cur_x, cur_y, dest_x, dest_y)
+  return get_path(cur_x, cur_y, self.ctx, self.cty)
 end
 
 -- menu class
@@ -942,8 +950,24 @@ function get_resources(x, y)
   return resources[key]
 end
 
-function use_resource(x, y, amt)
-  resources[coord_key(x, y)] = get_resources(x, y) - (amt or 1)
+function use_resource(x, y, owner, amt)
+  amt = amt or 1
+  local new = get_resources(x, y) - amt
+  resources[coord_key(x, y)] = new
+  local cell = mget(x, y)
+  local player = players[owner]
+
+  if fget(cell, f.food) then
+    player.food += amt
+  elseif fget(cell, f.money) then
+    player.money += amt
+  elseif fget(cell, f.material) then
+    player.materials += amt
+  end
+
+  if new == 0 then
+    mset(x, y, flr(cell / 16) * 16)
+  end
 end
 
 function _init()
