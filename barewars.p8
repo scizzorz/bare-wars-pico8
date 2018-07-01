@@ -5,27 +5,27 @@ __lua__
 -- by john weachock
 
 -- enums
-local b = {left=0, right=1, up=2, down=3, o=4, x=5}
-local c = {
+b = {left=0, right=1, up=2, down=3, o=4, x=5}
+c = {
   black=0, darkblue=1, darkpurple=2, darkgreen=3,
   brown=4, darkgrey=5, lightgrey=6, white=7,
   red=8, orange=9, yellow=10, green=11,
   blue=12, indigo=13, pink=14, peach=15,
 }
-local f = {
+f = {
   solid=0,
   food=1,
   money=2,
   material=3,
 }
-local s = {
+s = {
   splash=0,
   command=1,
   play=2,
   menu=3,
   move=4,
 }
-local t = {
+t = {
   curs1=1,
   curs2=2,
   curs3=3,
@@ -48,7 +48,7 @@ function pop(stack)
   return v
 end
 
--- https://github.com/clowerweb/Lib-Pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
+-- https://github.com/clowerweb/lib-pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
 function dst(o1, o2)
  return sqrt(sqr(o1.x - o2.x) + sqr(o1.y - o2.y))
 end
@@ -401,8 +401,9 @@ local anim_curs = _anim({t.curs1, t.curs2, t.curs3, t.curs4}, 10)
 -- unit class
 local _unit = _sprite:extend()
 
-function _unit:init(x, y, palette)
-  self.__super.init(self, 5, x, y, palette)
+function _unit:init(owner, x, y, palette)
+  self.__super.init(self, anim_stand, x, y, palette)
+  self.owner = owner
   self.tx = x
   self.ty = y
   self.path = nil
@@ -590,12 +591,11 @@ function _meter:draw()
 end
 
 -- elements
-local ui = {}
-local units = {}
+units = {}
 
-local prev_state = nil
-local state = s.command
-local play_timer = 128
+prev_state = nil
+state = s.command
+play_timer = 128
 
 cam = _camera()
 curs = _sprite(anim_curs:copy(), 64, 64, pal_trans_red)
@@ -605,11 +605,9 @@ play_meter.y = 120
 menu = _menu()
 follow = nil
 
-add(ui, curs)
-
-local bear1 = _unit(16, 16, pal_race1)
-local bear2 = _unit(16 + 36 * 8, 24, pal_race2)
-local bear3 = _unit(16 + 36 * 16, 32, pal_race3)
+bear1 = _unit(1, 16, 16, pal_race1)
+bear2 = _unit(2, 16 + 36 * 8, 24, pal_race2)
+bear3 = _unit(3, 16 + 36 * 16, 32, pal_race3)
 
 add(units, bear1)
 add(units, bear2)
