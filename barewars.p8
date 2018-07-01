@@ -728,19 +728,19 @@ function _info:draw()
 
   if fget(cell_n, f.food) then
     spr(t.ui_food, ui_left + 4, top + 6)
-    print('food', ui_left + 12, top + 7, c.white)
+    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
     show_followed = false
   end
 
   if fget(cell_n, f.material) then
     spr(t.ui_material, ui_left + 4, top + 6)
-    print('material', ui_left + 12, top + 7, c.white)
+    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
     show_followed = false
   end
 
   if fget(cell_n, f.money) then
     spr(t.ui_money, ui_left + 4, top + 6)
-    print('money', ui_left + 12, top + 7, c.white)
+    print(get_resources(curs_x, curs_y), ui_left + 12, top + 7, c.white)
     show_followed = false
   end
 
@@ -907,6 +907,7 @@ function change_state(to)
   state = to
 end
 
+-- move to the next player, or start the play state
 function next_turn()
   cur_player += 1
 
@@ -927,6 +928,22 @@ function next_turn()
     play_timer = 128
     change_state("play")
   end
+end
+
+resources = {}
+
+-- return the resources left on a node, generating if necessary
+function get_resources(x, y)
+  local key = coord_key(x, y)
+  if resources[key] == nil then
+    resources[key] = flr(rnd(128) + 64)
+  end
+
+  return resources[key]
+end
+
+function use_resource(x, y, amt)
+  resources[coord_key(x, y)] = get_resources(x, y) - (amt or 1)
 end
 
 function _init()
