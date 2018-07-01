@@ -480,34 +480,45 @@ function _unit:update()
       if #path == 0 then
         self.tile = anim_stand
         self.path = nil
+        to_coord = nil
+      else
+        to_coord = path[#path]
       end
     end
 
-    if self.x ~= self.tx  or self.y ~= self.ty then
+    if to_coord then
+      if self.x ~= self.tx  or self.y ~= self.ty then
+        self:consume()
+      end
+
+      -- move to path
+      if self.x < to_coord[1] * 8 then
+        self.x += 1
+        self.flipx = false
+      end
+
+      if self.x > to_coord[1] * 8 then
+        self.x -= 1
+        self.flipx = true
+      end
+
+      if self.y < to_coord[2] * 8 then
+        self.y += 1
+      end
+
+      if self.y > to_coord[2] * 8 then
+        self.y -= 1
+      end
+    end
+
+  -- consume resources
+  else
+    local res = get_resources(self.ctx, self.cty)
+    if self.x == self.tx and self.y == self.ty and res and res > 0 then
       self:consume()
+      use_resource(self.ctx, self.cty, self.owner)
     end
 
-    -- move to path
-    if self.x < to_coord[1] * 8 then
-      self.x += 1
-      self.flipx = false
-    end
-    if self.x > to_coord[1] * 8 then
-      self.x -= 1
-      self.flipx = true
-    end
-    if self.y < to_coord[2] * 8 then
-      self.y += 1
-    end
-    if self.y > to_coord[2] * 8 then
-      self.y -= 1
-    end
-  end
-
-  local res = get_resources(self.ctx, self.cty)
-  if self.x == self.tx and self.y == self.ty and res and res > 0 then
-    self:consume()
-    use_resource(self.ctx, self.cty, self.owner)
   end
 end
 
