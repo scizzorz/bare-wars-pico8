@@ -438,7 +438,7 @@ local _unit = _sprite:extend()
 
 function _unit:init(owner, x, y, palette)
   self.__super.init(self, anim_stand, x, y, palette)
-  self.health = 3
+  self.health = 4
   self.max_health = 4
   self.owner = owner
   self.tx = x
@@ -457,10 +457,8 @@ function _unit:consume(amt)
   while self.step >= 32 do
     self.step -= 32
     if owner.food > 0 then
-      printh(self.owner .. ' consuming a food!')
       owner.food -= 1
     else
-      printh(self.owner .. ' starving!')
       self.health -= 1
     end
   end
@@ -472,46 +470,38 @@ function _unit:update()
 
   local path = self.path
   if path and #path > 0 then
-    local to_coord = path[#path]
+    self:consume()
+    local waypoint = path[#path]
+
+    -- move to waypoint
+    if self.x < waypoint[1] * 8 then
+      self.x += 1
+      self.flipx = false
+    end
+
+    if self.x > waypoint[1] * 8 then
+      self.x -= 1
+      self.flipx = true
+    end
+
+    if self.y < waypoint[2] * 8 then
+      self.y += 1
+    end
+
+    if self.y > waypoint[2] * 8 then
+      self.y -= 1
+    end
 
     -- pop current waypoint if we're at it
-    if self.x == to_coord[1] * 8 and self.y == to_coord[2] * 8 then
+    if self.x == waypoint[1] * 8 and self.y == waypoint[2] * 8 then
       pop(path)
       if #path == 0 then
         self.tile = anim_stand
         self.path = nil
-        to_coord = nil
-      else
-        to_coord = path[#path]
       end
     end
 
-    if to_coord then
-      if self.x ~= self.tx  or self.y ~= self.ty then
-        self:consume()
-      end
-
-      -- move to path
-      if self.x < to_coord[1] * 8 then
-        self.x += 1
-        self.flipx = false
-      end
-
-      if self.x > to_coord[1] * 8 then
-        self.x -= 1
-        self.flipx = true
-      end
-
-      if self.y < to_coord[2] * 8 then
-        self.y += 1
-      end
-
-      if self.y > to_coord[2] * 8 then
-        self.y -= 1
-      end
-    end
-
-  -- consume resources
+    -- consume resources
   else
     local res = get_resources(self.ctx, self.cty)
     if self.x == self.tx and self.y == self.ty and res and res > 0 then
@@ -541,7 +531,6 @@ function _unit:set_dest(tx, ty)
   self.cty = flr(ty / 8)
   self.path = self:get_path()
   if #self.path > 0 then
-    printh("setting animation")
     self.tile = anim_walk:copy()
   else
     self.path = nil
@@ -916,12 +905,10 @@ end
 -- change the state, recording the previous one as well
 function change_state(to)
   if type(to) == "string" then
-    printh("changing state to " .. to)
     to = s[to]
   else
     for k, v in pairs(s) do
       if v == to then
-        printh("changing state to " .. k)
         break
       end
     end
@@ -980,13 +967,10 @@ function use_resource(x, y, owner, amt)
 
   if fget(cell, f.food) then
     player.food += amt
-    printh('giving ' .. owner .. ' ' .. amt .. ' food')
   elseif fget(cell, f.money) then
     player.money += amt
-    printh('giving ' .. owner .. ' ' .. amt .. ' money')
   elseif fget(cell, f.material) then
     player.materials += amt
-    printh('giving ' .. owner .. ' ' .. amt .. ' mats')
   end
 
   if new == 0 then
