@@ -4,7 +4,24 @@ __lua__
 -- bare wars
 -- by john weachock
 
--- https://github.com/eevee/klinklang/blob/23c5715bda87f3c787e1c5fe78f30443c7bf3f56/object.lua
+-- https://github.com/clowerweb/Lib-Pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
+function dst(o1, o2)
+ return sqrt(sqr(o1.x - o2.x) + sqr(o1.y - o2.y))
+end
+
+function sqr(x) return x * x end
+
+-- mine: tile distance
+function tdst(o1, o2)
+ return sqrt(sqr(o1.x/8 - o2.x/8) + sqr(o1.y/8 - o2.y/8))
+end
+
+-- mine: manhattan distance
+function mdst(o1, o2)
+  return abs(o1.x - o2.x) + abs(o1.y - o2.y)
+end
+
+-- https://github.com/eevee/klinklang/blob/23c5715bda87f3c787e1c5fe78f30443c7bf3f56/object.lua (modified since)
 local object = {}
 object.__index = object
 
@@ -50,7 +67,6 @@ function object:implement(...)
   for _, mixin in pairs{...} do
     for k, v in pairs(mixin) do
       if self[k] == nil and type(v) == "function" then
-        print("assigning", k)
         self[k] = v
       end
     end
