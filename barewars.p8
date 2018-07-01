@@ -174,7 +174,7 @@ function contains(t,v)
 end
 
 function check_cell(x, y)
-  if x < 128 and x >= 0 and y < 32 and y >= 0 then
+  if x < 128 and x >= 0 and y < 64 and y >= 0 then
     local n = mget(x, y)
     local is_solid = fget(n, f.solid)
     if not is_solid then
