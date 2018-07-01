@@ -54,8 +54,9 @@ t = {
   ui_corner=23,
   ui_food=49,
   ui_money=50,
-  ui_materials=51,
+  ui_material=51,
   ui_heart=52,
+  ui_unit=53,
 }
 
 -- sfx
@@ -424,6 +425,8 @@ function pal_race3()
   pal(c.orange, c.lightgrey)
 end
 
+races = {pal_race1, pal_race2, pal_race3}
+
 -- animations
 local anim_stand = t.walk1
 local anim_walk = _anim({t.walk1, t.walk2, t.walk1, t.walk3}, 10)
@@ -659,6 +662,7 @@ function _info:draw()
   palt(c.black, false)
   palt(c.red, true)
 
+  local player = players[cur_player]
   local player_colors = {c.red, c.blue, c.yellow, c.green, c.darkgrey, c.darkgrey, c.darkgrey, c.darkgrey}
   local left = self.x + cam.x
   local top = self.y + cam.y
@@ -698,17 +702,50 @@ function _info:draw()
   palt(c.red, true)
 
   -- draw resources
-  spr(t.ui_food, ui_left + 2, top - 1)
-  print(players[cur_player].food, ui_left + 11, top, c.white)
+  spr(t.ui_food, ui_left + 3, top - 1)
+  print(player.food, ui_left + 10, top, c.white)
 
-  spr(t.ui_money, ui_left + 24, top - 1)
-  print(players[cur_player].money, ui_left + 32, top, c.white)
+  spr(t.ui_money, ui_left + 23, top - 1)
+  print(player.money, ui_left + 30, top, c.white)
 
-  spr(t.ui_materials, ui_left + 46, top - 1)
-  print(players[cur_player].materials, ui_left + 55, top, c.white)
+  spr(t.ui_material, ui_left + 44, top - 1)
+  print(player.materials, ui_left + 51, top, c.white)
+
+  races[player.race]()
+  spr(t.ui_unit, ui_left + 65, top - 1)
+  print(player.units, ui_left + 73, top, c.white)
+
+  -- reset palette swaps
+  pal()
+  palt(c.red, true)
+  palt(c.black, false)
+
+  -- draw focused map info
+  local show_followed = true
+  local curs_x = flr(curs.x / 8)
+  local curs_y = flr(curs.y / 8)
+  local cell_n = mget(curs_x, curs_y)
+
+  if fget(cell_n, f.food) then
+    spr(t.ui_food, ui_left + 4, top + 6)
+    print('food', ui_left + 12, top + 7, c.white)
+    show_followed = false
+  end
+
+  if fget(cell_n, f.material) then
+    spr(t.ui_material, ui_left + 4, top + 6)
+    print('material', ui_left + 12, top + 7, c.white)
+    show_followed = false
+  end
+
+  if fget(cell_n, f.money) then
+    spr(t.ui_money, ui_left + 4, top + 6)
+    print('money', ui_left + 12, top + 7, c.white)
+    show_followed = false
+  end
 
   -- draw focused unit health
-  if follow ~= nil then
+  if show_followed and follow ~= nil then
     palt(c.red, false)
     palt(c.brown, true)
 
@@ -737,9 +774,11 @@ players = {}
 
 for p=1,num_players do
   add(players, {
+    race=p,
     money=200,
     materials=200,
     food=200,
+    units=1,
   })
 end
 
@@ -752,9 +791,9 @@ player_ui = _info()
 menu = _menu()
 follow = nil
 
-bear1 = _unit(1, 16, 16, pal_race1)
-bear2 = _unit(2, 16 + 36 * 8, 24, pal_race2)
-bear3 = _unit(3, 16 + 36 * 16, 32, pal_race3)
+bear1 = _unit(1, 16, 16, races[players[1].race])
+bear2 = _unit(2, 16 + 36 * 8, 24, races[players[2].race])
+bear3 = _unit(3, 16 + 36 * 16, 32, races[players[3].race])
 
 add(units, bear1)
 add(units, bear2)
@@ -874,6 +913,15 @@ function next_turn()
   if cur_player <= num_players then
     change_state("command")
     jump_to_first_owned()
+    local owned = 0
+
+    for unit in all(units) do
+      if unit.owner == cur_player then
+        owned += 1
+      end
+    end
+
+    players[cur_player].units = owned
   else
     cur_player = 0
     play_timer = 128
@@ -1064,7 +1112,7 @@ function _draw()
     sel_curs:draw()
   end
 
-  if state == s.menu or state == s.command then
+  if state == s.menu or state == s.command or state == s.move then
     player_ui:draw()
   end
 
@@ -1074,19 +1122,6 @@ function _draw()
 
   if state == s.play then
     play_meter:draw()
-  end
-
-  local curs_x = flr(curs.x / 8)
-  local curs_y = flr(curs.y / 8)
-  local cell_n = mget(curs_x, curs_y)
-  if fget(cell_n, f.food) then
-    print('food', cam.x, cam.y + 8, c.white)
-  end
-  if fget(cell_n, f.money) then
-    print('money', cam.x, cam.y + 8, c.white)
-  end
-  if fget(cell_n, f.material) then
-    print('material', cam.x, cam.y + 8, c.white)
   end
 end
 
@@ -1115,14 +1150,14 @@ __gfx__
 00000000061111111111111106111111007700000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000061111111111111106111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000061111111111111106111111000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00000000888888888888888888888888440404440000000000000000000000000000000000000000000000000000000033333333333333333333333333333333
-00000000888887888889988888484488408080440000000000000000000000000000000000000000000000000000000033bb333333bbbb3333344333333bb333
-000000008888f778889a7988888444480888e8040000000000000000000000000000000000000000000000000000000033b333b33b2b2bb33344443333bbbb33
-0000000088444f88889aa98888444448408880440000000000000000000000000000000000000000000000000000000033333bb33bbbb2b33399993333bbbb33
-0000000084444888889aa9888499448844080444000000000000000000000000000000000000000000000000000000003b3333333b2bbbb3334444333bbbbbb3
-0000000084444888889aa9888499488844404444000000000000000000000000000000000000000000000000000000003bb33b3333bb2b333399993333344333
-00000000844488888889988888448888444444440000000000000000000000000000000000000000000000000000000033333bb3333bb3333344443333344333
-00000000888888888888888888888888444444440000000000000000000000000000000000000000000000000000000033333333333333333333333333333333
+00000000888888888888888888888888440404448888888800000000000000000000000000000000000000000000000033333333333333333333333333333333
+00000000888878888889988884844488408080448944498800000000000000000000000000000000000000000000000033bb333333bbbb3333344333333bb333
+00000000888f7788889a7988884444880888e8048404048800000000000000000000000000000000000000000000000033b333b33b2b2bb33344443333bbbb33
+000000008444f888889aa98884994488408880448440448800000000000000000000000000000000000000000000000033333bb33bbbb2b33399993333bbbb33
+0000000084448888889aa9888499488844080444844444880000000000000000000000000000000000000000000000003b3333333b2bbbb3334444333bbbbbb3
+0000000084448888888998888844888844404444849994880000000000000000000000000000000000000000000000003bb33b3333bb2b333399993333344333
+00000000888888888888888888888888444444448888888800000000000000000000000000000000000000000000000033333bb3333bb3333344443333344333
+00000000888888888888888888888888444444448888888800000000000000000000000000000000000000000000000033333333333333333333333333333333
 33333333333333333333333333333333333333333333333333333333333333330000000000000000000000000000000000000000000000000000000000000000
 3333333333bb333333bbbb3333344333333bb3333333333333333333333333330000000000000000000000000000000000000000000000000000000000000000
 3333333333b333b33b2b2bb33344443333bbbb333333333333333333333333330000000000000000000000000000000000000000000000000000000000000000
