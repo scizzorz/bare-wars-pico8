@@ -4,6 +4,21 @@ __lua__
 -- bare wars
 -- by john weachock
 
+-- enums
+local b = {left=0, right=1, up=2, down=3, o=4, x=5}
+local c = {
+  black=0, darkblue=1, darkpurple=2, darkgreen=3,
+  brown=4, darkgrey=5, lightgrey=6, white=7,
+  red=8, orange=9, yellow=10, green=11,
+  blue=12, indigo=13, pink=14, peach=15,
+}
+local f = {
+  solid=0,
+  food=1,
+  money=2,
+  material=3,
+}
+
 -- https://github.com/clowerweb/Lib-Pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
 function dst(o1, o2)
  return sqrt(sqr(o1.x - o2.x) + sqr(o1.y - o2.y))
@@ -21,7 +36,7 @@ function mdst(o1, o2)
   return abs(o1.x - o2.x) + abs(o1.y - o2.y)
 end
 
--- https://github.com/eevee/klinklang/blob/23c5715bda87f3c787e1c5fe78f30443c7bf3f56/object.lua (modified since)
+-- https://github.com/eevee/klinklang/blob/23c5715bda87f3c787e1c5fe78f30443c7bf3f56/object.lua (modified)
 local object = {}
 object.__index = object
 
@@ -34,14 +49,9 @@ end
 
 
 -- methods
-function object:init()
-end
-
-function object:update()
-end
-
-function object:draw()
-end
+function object:init() end
+function object:update() end
+function object:draw() end
 
 
 -- subclassing
@@ -86,7 +96,25 @@ function object:isa(class)
   return false
 end
 
--- camera object
+
+-- pathfinding
+function get_neighbors(x, y)
+end
+
+function check_cell(x, y)
+  if x < 128 and x >= 0 and y < 32 and y >= 0 then
+    local n = mget(x, y)
+    local is_solid = fget(n, f.solid)
+    if is_solid then
+      return true
+    end
+  end
+
+  return false
+end
+
+
+-- camera class
 local _camera = object:extend()
 
 function _camera:init()
@@ -119,7 +147,7 @@ function _camera:draw()
   camera(self.x, self.y)
 end
 
--- sprite object
+-- sprite class
 local _sprite = object:extend()
 
 function _sprite:init(tile, x, y, palette)
@@ -167,7 +195,7 @@ function _sprite:dmove(dx, dy)
   self.y += dy
 end
 
--- anim object
+-- anim class
 local _anim = object:extend()
 
 function _anim:init(frames, speed, loop, reverse)
@@ -220,15 +248,6 @@ function _anim:copy()
   return _anim(self.frames, self.speed, self.loop, self.reverse)
 end
 
--- enums
-local b = {left=0, right=1, up=2, down=3, o=4, x=5}
-local c = {
-  black=0, darkblue=1, darkpurple=2, darkgreen=3,
-  brown=4, darkgrey=5, lightgrey=6, white=7,
-  red=8, orange=9, yellow=10, green=11,
-  blue=12, indigo=13, pink=14, peach=15,
-}
-
 -- palettes
 function pal_trans_red()
   palt(c.red, true)
@@ -258,15 +277,24 @@ end
 local anim_stand = 5
 local anim_walk = _anim({5, 6, 5, 7}, 10)
 
--- unit object
+-- unit class
 local _unit = _sprite:extend()
 
 function _unit:init(x, y, palette)
   self.__super.init(self, 5, x, y, palette)
+  self.tx = x
+  self.ty = y
 end
 
 function _unit:draw()
   self.__super.draw(self)
+end
+
+function _unit:get_path()
+  local cur_x = flr(self.x / 8)
+  local cur_y = flr(self.y / 8)
+  local dest_x = flr(self.tx / 8)
+  local dest_y = flr(self.ty / 8)
 end
 
 -- elements
@@ -418,6 +446,19 @@ function _draw()
   for sprite in all(ui) do
     sprite:draw()
   end
+
+  local curs_x = flr(curs.x / 8)
+  local curs_y = flr(curs.y / 8)
+  local cell_n = mget(curs_x, curs_y)
+  if fget(cell_n, f.food) then
+    print('food', cam.x, cam.y)
+  end
+  if fget(cell_n, f.money) then
+    print('money', cam.x, cam.y)
+  end
+  if fget(cell_n, f.material) then
+    print('material', cam.x, cam.y)
+  end
 end
 
 __gfx__
@@ -477,6 +518,9 @@ dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd0000000000000000
 44444444449449444e4bbb44447ee744444554444444444444444444444444440000000000000000000000000000000000000000000000000000000000000000
 44444444444944944444b44444777744444554444444444444444444444444440000000000000000000000000000000000000000000000000000000000000000
 44444444444444444444444444444444444444444444444444444444444444440000000000000000000000000000000000000000000000000000000000000000
+__gff__
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000305090000000000000000000000000003050900000000000000000000000000030509000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 4040404040404040404040404040404040404040404040404040404040404040404040404060606060606060606060606060606060606060606060606060606060606060606060606050505050505050505050505050505050505050505050505050505050505050505050505000000000000000000000000000000000000000
 4040404040404040404040404040404040404040404040404040404040404040404040404060606060606060606060606060606060606060606060606060606060606060606060606050505050505050505050505050505050505050505050505050505050505050505050505000000000000000000000000000000000000000
