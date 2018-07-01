@@ -148,7 +148,7 @@ function _sprite:dmove(dx, dy)
   self.y += dy
 end
 
-sprites = {}
+ui = {}
 cam = _camera()
 curs = _sprite(1, 64, 64, 8)
 units = {}
@@ -157,10 +157,7 @@ bear1 = _sprite(5, 16, 16, 8)
 bear2 = _sprite(37, 16 + 36 * 8, 24, 8)
 bear3 = _sprite(21, 16 + 36 * 16, 32, 8)
 
-add(sprites, curs)
-add(sprites, bear1)
-add(sprites, bear2)
-add(sprites, bear3)
+add(ui, curs)
 
 add(units, bear1)
 add(units, bear2)
@@ -173,7 +170,11 @@ function _update()
   cam:move(curs.x - 60, curs.y - 60)
   cam:update()
 
-  for sprite in all(sprites) do
+  for sprite in all(units) do
+    sprite:update()
+  end
+
+  for sprite in all(ui) do
     sprite:update()
   end
 
@@ -181,7 +182,20 @@ function _update()
   if btnp(1) then curs:dmove(8, 0) end
   if btnp(2) then curs:dmove(0, -8) end
   if btnp(3) then curs:dmove(0, 8) end
-  if btnp(4) then curs:dmove(36 * 8, 0) end
+  if btnp(4) then
+    local closest_unit = units[1]
+    local closest_dist = mdst(units[1], curs)
+    for unit in all(units) do
+      local unit_dist = mdst(unit, curs)
+      if unit_dist < closest_dist then
+        closest_dist = unit_dist
+        closest_unit = unit
+      end
+    end
+
+    curs.x = closest_unit.x
+    curs.y = closest_unit.y
+  end
   if btnp(5) then curs:dmove(-36 * 8, 0) end
 end
 
@@ -191,7 +205,11 @@ function _draw()
   cam:draw()
   map(0, 0)
 
-  for sprite in all(sprites) do
+  for sprite in all(units) do
+    sprite:draw()
+  end
+
+  for sprite in all(ui) do
     sprite:draw()
   end
 end
