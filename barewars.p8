@@ -15,6 +15,16 @@ c = {
   blue=12, indigo=13, pink=14, peach=15,
 }
 
+-- player colors
+player_colors = {
+  c.red,    -- 1
+  c.blue,   -- 2
+  c.yellow, -- 3
+  c.green,  -- 4
+  c.orange, -- 5
+  c.pink,   -- 6
+}
+
 -- flags
 f = {
   solid=0,
@@ -520,6 +530,7 @@ function _unit:draw()
       line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, c.yellow)
     end
   end
+  pset(self.x, self.y, player_colors[self.owner])
 
   self.__super.draw(self)
 end
@@ -693,7 +704,6 @@ function _info:draw()
     end
   end
 
-  local player_colors = {c.red, c.blue, c.yellow, c.green, c.darkgrey, c.darkgrey, c.darkgrey, c.darkgrey}
   local left = self.x + cam.x
   local top = self.y + cam.y
   local ui_start = ui_slot
