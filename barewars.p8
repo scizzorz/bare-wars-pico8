@@ -776,6 +776,15 @@ function _info:draw()
     end
   end
 
+  for i=1, #units do
+    local top = 6 + cam.y + 4 * i
+    local left = 2 + cam.x
+    if follow == units[i] then
+      rectfill(left - 1, top - 1, left + 1, top + 1, c.lightgrey)
+    end
+    pset(left, top, player_colors[units[i].owner])
+  end
+
   local left = self.x + cam.x
   local top = self.y + cam.y
   local ui_start = ui_slot
