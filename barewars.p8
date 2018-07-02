@@ -780,7 +780,7 @@ function _info:draw()
     local top = 6 + cam.y + 4 * i
     local left = 2 + cam.x
     if follow == units[i] then
-      rectfill(left - 1, top - 1, left + 1, top + 1, c.lightgrey)
+      rectfill(left - 1, top - 1, left + 1, top + 1, c.darkgrey)
     end
     pset(left, top, player_colors[units[i].owner])
   end
@@ -1033,6 +1033,32 @@ function jump_to_prev_unit()
   sfx(a.ping)
 end
 
+-- move the cursor to the next unit owned by the cur_player
+function jump_to_next_owned()
+  local next = fals
+
+  for unit in all(units) do
+
+    if unit.owner == cur_player then
+      if next then
+        follow = unit
+        curs:move(unit.x, unit.y)
+        sfx(a.ping)
+        return
+      end
+
+      local unit_dist = mdst(unit, curs)
+
+      if unit_dist == 0 then
+        next = true
+      end
+    end
+
+  end
+
+  jump_to_first_owned()
+end
+
 -- move the cursor to the first unit owned by the cur_player
 function jump_to_first_owned()
   for unit in all(units) do
@@ -1219,11 +1245,19 @@ function _update()
     end
 
     if btnp(b.up) then
-      curs:dmove(0, -8)
+      if btns[b.o] then
+        jump_to_prev_building()
+      else
+        curs:dmove(0, -8)
+      end
     end
 
     if btnp(b.down) then
-      curs:dmove(0, 8)
+      if btns[b.o] then
+        jump_to_next_building()
+      else
+        curs:dmove(0, 8)
+      end
     end
 
     follow = nil
@@ -1240,7 +1274,11 @@ function _update()
     end
 
     if not pbtns[b.o] and btns[b.o] then
-      jump_to_closest_unit()
+      if cur_player then
+        jump_to_next_owned()
+      else
+        jump_to_next_unit()
+      end
     end
 
     if btnp(b.x) then
