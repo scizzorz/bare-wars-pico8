@@ -578,26 +578,47 @@ function _menu:init()
 end
 
 function _menu:clear()
+  self.back = nil
   self.labels = {}
   self.callbacks = {}
+  self.enables = {}
   self.idx = 1
 end
 
-function _menu:add(label, callback)
+function _menu:add(label, callback, enabled)
+  if enabled == nil then
+    enabled = true
+  end
+
   add(self.labels, label)
   add(self.callbacks, callback)
+  add(self.enables, enabled)
 end
 
 function _menu:up()
-  self.idx = max(1, self.idx - 1)
+  -- self.idx = max(1, self.idx - 1)
+  for i=self.idx - 1, 1, -1 do
+    if self.enables[i] then
+      self.idx = i
+      break
+    end
+  end
 end
 
 function _menu:down()
-  self.idx = min(#self.labels, self.idx + 1)
+  for i=self.idx + 1, #self.labels do
+    if self.enables[i] then
+      self.idx = i
+      break
+    end
+  end
+  -- self.idx = min(#self.labels, self.idx + 1)
 end
 
 function _menu:call()
-  self.callbacks[self.idx]()
+  if self.enables[self.idx] then
+    self.callbacks[self.idx]()
+  end
 end
 
 function _menu:draw()
@@ -639,6 +660,9 @@ function _menu:draw()
     if y == self.idx then
       col = c.white
       spr(t.menu_arr, left + 2, top - 4 + 8 * y)
+    end
+    if not self.enables[y] then
+      col = c.darkgrey
     end
 
     print(self.labels[y], left + 10, top - 3 + 8 * y, col)
@@ -1032,6 +1056,40 @@ function get_resources(x, y)
   return resources[key]
 end
 
+-- make the base menu when clicking from command mode
+function make_base_menu()
+  menu:clear()
+
+  if follow ~= nil and follow.owner == cur_player then
+    menu:add("move", function()
+      change_state("move")
+    end)
+
+    if follow.type == u.worker then
+      menu:add("build", make_build_menu)
+    end
+  end
+
+  menu:add("hire", make_hire_menu)
+  menu:add("end turn", next_turn)
+end
+
+function make_build_menu()
+  local player = players[cur_player]
+  menu:clear()
+  menu:add("workery", function() end, player.materials > 80)
+  menu:add("barracks", function() end, player.materials > 120)
+  menu.back = make_base_menu
+end
+
+function make_hire_menu()
+  local player = players[cur_player]
+  menu:clear()
+  menu:add("worker", function() end, player.money > 60)
+  menu:add("warrior", function() end, player.money > 100)
+  menu.back = make_base_menu
+end
+
 function use_resource(x, y, owner, amt)
   local res = get_resources(x, y)
   amt = min(amt or 1, res)
@@ -1109,17 +1167,9 @@ function _update()
     end
 
     if btnp(b.x) then
-      menu:clear()
-
       if state == s.command then
-        if follow ~= nil and follow.owner == cur_player then
-          menu:add("move", function()
-            change_state("move")
-          end)
-        end
-
-        menu:add("end turn", next_turn)
-    end
+        make_base_menu()
+      end
 
       if #menu.labels > 0 then
         change_state("menu")
@@ -1140,7 +1190,11 @@ function _update()
     end
 
     if btnp(b.o) then
-      change_state(prev_state)
+      if menu.back ~= nil then
+        menu.back()
+      else
+        change_state(prev_state)
+      end
     end
 
     menu:update()
@@ -1169,8 +1223,13 @@ function _update()
       curs.palette = pal_trans_red
     end
 
+    if not check_cell(flr(curs.x / 8), flr(curs.y / 8)) then
+      -- FIXME for warriors
+      -- curs.palette = pal_bad_curs
+    end
+
     if btnp(b.x) then
-      if dist <= 128 then
+      if curs.palette == pal_trans_red then
         follow:set_dest(curs.x, curs.y)
         curs.palette = pal_trans_red
         follow = nil
