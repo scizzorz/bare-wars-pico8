@@ -76,6 +76,12 @@ a = {
   no=2,
 }
 
+-- unit types
+u = {
+  worker=0,
+  warrior=1,
+}
+
 -- https://www.lexaloffle.com/bbs/?tid=3389
 function pop(stack)
   local v = stack[#stack]
@@ -436,7 +442,15 @@ function pal_race3()
   pal(c.orange, c.lightgrey)
 end
 
-races = {pal_race1, pal_race2, pal_race3}
+function pal_race4()
+  palt(c.red, true)
+  palt(c.black, false)
+  pal(c.black, c.lightgrey)
+  pal(c.brown, c.white)
+  pal(c.orange, c.darkgrey)
+end
+
+races = {pal_race1, pal_race2, pal_race3, pal_race4}
 
 -- animations
 local anim_stand = t.walk1
@@ -448,6 +462,7 @@ local _unit = _sprite:extend()
 
 function _unit:init(owner, x, y, palette)
   self.__super.init(self, anim_stand, x, y, palette)
+  self.type = u.worker
   self.health = 4
   self.max_health = 4
   self.owner = owner
@@ -840,7 +855,7 @@ function init_players()
   players = {}
   order = {}
   for p=1, num_players do
-    local race = flr(rnd(3) + 1)
+    local race = flr(rnd(#races) + 1)
     local worker = _unit(p, flr(rnd(128)) * 8, flr(rnd(64)) * 8, races[race])
     add(units, worker)
     add(order, p)
