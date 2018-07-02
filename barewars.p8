@@ -1040,6 +1040,7 @@ function jump_to_first_owned()
       follow = unit
       curs:move(unit.x, unit.y)
       sfx(a.ping)
+      break
     end
   end
 end
@@ -1245,10 +1246,10 @@ function _update()
     if btnp(b.x) then
       if state == s.command then
         make_base_menu()
-      end
 
-      if #menu.labels > 0 then
-        change_state("menu")
+        if #menu.labels > 0 then
+          change_state("menu")
+        end
       end
     end
 
