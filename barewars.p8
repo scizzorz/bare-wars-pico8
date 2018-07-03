@@ -1337,7 +1337,6 @@ end
 function build_house(house_type, owner, x, y)
   local player = players[owner]
   local new = _house(owner, x * 8, y * 8, house_type)
-  player.materials -= hc[house_type]
 
   add(houses, new)
   change_state(prev_state)
