@@ -495,7 +495,7 @@ end
 function pal_bad_curs()
   palt(c.red, true)
   palt(c.black, false)
-  pal(c.black, c.brown)
+  pal(c.black, c.darkpurple)
 end
 
 function pal_race1()
@@ -638,6 +638,15 @@ function _unit:draw()
     end
   end
   if self ~= follow then
+    --[[ health bar?
+    local col = c.darkpurple
+    for i=1,self.max_health do
+      pset(self.x + i, self.y, col)
+      if i == self.health then
+        col = c.darkblue
+      end
+    end
+    ]]
     pset(self.x, self.y, player_colors[self.owner])
   end
 
