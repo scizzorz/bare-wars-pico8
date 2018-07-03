@@ -1765,18 +1765,17 @@ function _draw()
       end
 
     elseif state == s.win then
-      printh("victory for " .. order[1])
-      print("victory", 47, 48, c.lightgrey)
+      print("victory", 50, 48, c.lightgrey)
 
+      local off_x = 64 - num_players * 8 - 10
       for i=1, num_players do
         local col = c.indigo
         if i == order[1] then
           col = player_colors[i]
         end
-        print(i, i * 16 - 4, 64, col)
+        print(i, i * 16 + off_x, 64, col)
       end
 
-      cam:update()
       print("reset \142+\151", 43, 80, c.lightgrey)
 
       if btn(b.o) and btn(b.x) then
