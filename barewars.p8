@@ -508,7 +508,7 @@ function pal_race2()
   palt(c.red, true)
   palt(c.black, false)
   pal(c.brown, c.darkblue)
-  pal(c.orange, c.darkgrey)
+  pal(c.orange, c.brown)
 end
 
 function pal_race3()
