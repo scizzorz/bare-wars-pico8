@@ -1510,15 +1510,15 @@ function _draw()
       print(i .. "p", i * 16 - 4, 64, col)
     end
 
-    local col = c.lightgrey
-    print("press \142+\151", 43, 80, col)
+    print("press \142+\151", 43, 80, c.lightgrey)
 
+    local col = player_colors[num_players]
     if btn(b.x) then
-      print("         \151", 43, 80, c.white)
+      print("         \151", 43, 80, col)
     end
 
     if btn(b.o) then
-      print("      \142", 43, 80, c.white)
+      print("      \142", 43, 80, col)
     end
 
     if btnp(b.left) then
