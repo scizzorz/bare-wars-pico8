@@ -531,6 +531,7 @@ function _unit:init(owner, x, y, palette, type)
   self.cty = flr(y / 8)
   self.path = nil
   self.step = 0
+  self.action = 0
 end
 
 function _unit:consume(amt)
@@ -546,6 +547,20 @@ function _unit:consume(amt)
       self.health -= 1
     end
   end
+end
+
+function _unit:act(amt)
+  amt = amt or 1
+  local owner = players[self.owner]
+
+  local count = 0
+  self.action += amt
+  while self.action >= 32 do
+    self.action -= 32
+    count += 1
+  end
+
+  return count
 end
 
 function _unit:update()
@@ -633,7 +648,8 @@ function _unit:use_resources(rel_x, rel_y)
   local res = get_resources(self.ctx + rel_x, self.cty + rel_y)
   if res and res > 0 then
     self:consume()
-    use_resource(self.ctx + rel_x, self.cty + rel_y, self.owner)
+    local count = self:act(self.gather * 2)
+    use_resource(self.ctx + rel_x, self.cty + rel_y, self.owner, count)
     return true
   end
 
@@ -912,11 +928,11 @@ function _info:draw()
   -- draw focused unit stats
   if follow ~= nil then
     for i=1, follow.fight do
-      spr(t.ui_sword, ui_left + (i + follow.max_health) * 6 - 2, top + 6)
+      spr(t.ui_sword, ui_left + (i + follow.max_health) * 6 + 2, top + 6)
     end
 
     for i=1, follow.gather do
-      spr(t.ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 - 2, top + 6)
+      spr(t.ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 + 6, top + 6)
     end
 
     -- hearts need a wacky palette swap
@@ -992,9 +1008,9 @@ function init_players()
       castle_x=x,
       castle_y=y,
       race=race,
-      money=40,
+      money=0,
       materials=0,
-      food=40,
+      food=20,
       units=1,
     })
   end
@@ -1188,7 +1204,7 @@ function get_resources(x, y)
   local is_resource = fget(cell, f.food) or fget(cell, f.money) or fget(cell, f.material)
   local key = coord_key(x, y)
   if is_resource and resources[key] == nil then
-    resources[key] = flr(rnd(128) + 64)
+    resources[key] = flr(rnd(24) + 8)
   end
 
   return resources[key]
@@ -1248,6 +1264,10 @@ end
 function use_resource(x, y, owner, amt)
   local res = get_resources(x, y)
   amt = min(amt or 1, res)
+
+  if amt <= 0 then
+    return
+  end
 
   local new = res - amt
   resources[coord_key(x, y)] = new
