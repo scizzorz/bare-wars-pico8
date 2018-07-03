@@ -100,6 +100,7 @@ a = {
   ping=0,
   ok=1,
   no=2,
+  bullet=3,
 }
 
 -- unit types
@@ -137,9 +138,9 @@ hc = {
 
 -- house stats
 hs = {
-  [h.castle] = {tile=t.blank, health=32, cap=16},
+  [h.castle] = {tile=t.blank, health=32, cap=32},
   [h.wall] = {tile=t.wall, health=8, speed=0},
-  [h.tower] = {tile=t.tower, health=16, cap=8},
+  [h.tower] = {tile=t.tower, health=16, cap=64},
   [h.cave] = {tile=t.cave, health=16, cap=256},
 }
 
@@ -738,6 +739,19 @@ function _house:draw()
 end
 
 function _house:act()
+  if self.type == h.tower then
+    for unit in all(units) do
+      if unit.owner ~= self.owner and mdst(unit, self) <= 16 then
+        sfx(a.bullet)
+        unit.health -= 1
+        self.action -= self.cap
+      end
+    end
+  elseif self.type == h.cave then
+    self.action -= self.cap
+    local new = hire_unit(u.warrior, self.owner, self.x, self.y + 8)
+  elseif self.type == h.castle then
+  end
 end
 
 
@@ -1306,13 +1320,17 @@ function get_resources(x, y)
 end
 
 -- hire a new unit
-function hire_unit(unit_type)
-  local player = players[cur_player]
-  local new = _unit(cur_player, player.castle_x * 8, player.castle_y * 8 + 16, races[player.race], unit_type)
-  player.money -= uc[unit_type]
+function hire_unit(unit_type, owner, x, y)
+  owner = owner or cur_player
+  local player = players[owner]
+  x = x or player.castle_x * 8
+  y = y or (player.castle_y * 8 + 16)
+
+  local new = _unit(owner, x, y, races[player.race], unit_type)
 
   add(units, new)
   change_state(prev_state)
+  return new
 end
 
 -- build a new house
@@ -1361,16 +1379,16 @@ function make_build_menu()
     return
   end
 
-  menu:add(hc[h.wall] .. " wall", function() build_house(h.wall, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.wall])
-  menu:add(hc[h.cave] .. " cave", function() build_house(h.cave, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.cave])
-  menu:add(hc[h.tower] .. " tower", function() build_house(h.tower, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.tower])
+  menu:add(hc[h.wall] .. " wall", function() build_house(h.wall, cur_player, curs_x, curs_y - 1); player.materials -= hc[h.wall] end, player.materials >= hc[h.wall])
+  menu:add(hc[h.cave] .. " cave", function() build_house(h.cave, cur_player, curs_x, curs_y - 1); player.materials -= hc[h.cave] end, player.materials >= hc[h.cave])
+  menu:add(hc[h.tower] .. " tower", function() build_house(h.tower, cur_player, curs_x, curs_y - 1); player.materials -= hc[h.tower] end, player.materials >= hc[h.tower])
 end
 
 function make_hire_menu()
   local player = players[cur_player]
   menu:clear()
-  menu:add(uc[u.worker] .. " worker", function() hire_unit(u.worker) end, player.money > uc[u.worker])
-  menu:add(uc[u.warrior] .. " warrior", function() hire_unit(u.warrior) end, player.money > uc[u.warrior])
+  menu:add(uc[u.worker] .. " worker", function() hire_unit(u.worker); player.money -= uc[u.worker] end, player.money >= uc[u.worker])
+  menu:add(uc[u.warrior] .. " warrior", function() hire_unit(u.warrior); player.money -= uc[u.warrior] end, player.money >= uc[u.warrior])
   menu.back = make_base_menu
 end
 
@@ -1994,4 +2012,4 @@ __sfx__
 00020000260500500030050300503005030040300403003030030300202d0003a6003a6002f0003960038600386003860038600386002e0002d0002a00028000210001d000190001600013000000000000000000
 000300002e3502d3502c3502b3502a0002b3502c3402d3302e3202d00030000380003d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000300000635007350083500935000000093500834007330063200430000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-00060000239002c8002980027800238001f8001b8001d900178002490015800148002a900148002190014800168002c90017800299001980020f001a80021f001b80023f0025a00205002b200395003f50000000
+000600001c750107301260027800238001f8001b8001d900178002490015800148002a900148002190014800168002c90017800299001980020f001a80021f001b80023f0025a00205002b200395003f50000000
