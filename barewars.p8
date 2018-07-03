@@ -138,10 +138,10 @@ hc = {
 
 -- house stats
 hs = {
-  [h.castle] = {tile=t.blank, health=32, cap=32},
-  [h.wall] = {tile=t.wall, health=8, speed=0},
-  [h.tower] = {tile=t.tower, health=16, cap=64},
-  [h.cave] = {tile=t.cave, health=16, cap=256},
+  [h.castle] = {tile=t.blank, health=12, cap=32},
+  [h.wall] = {tile=t.wall, health=4, speed=0},
+  [h.tower] = {tile=t.tower, health=6, cap=64},
+  [h.cave] = {tile=t.cave, health=6, cap=256},
 }
 
 
@@ -533,6 +533,7 @@ _unit = _sprite:extend()
 
 function _unit:init(owner, x, y, palette, type)
   self.__super.init(self, 0, x, y, palette)
+  self.is_unit = true
   self.owner = owner
   self.type = type or u.worker
   self.tile = an_stand[self.type]
@@ -626,6 +627,7 @@ function _unit:update()
     elseif self:use_resources(0, -1) then
     elseif self:use_resources(1, 0) then
     elseif self:use_resources(0, 1) then
+    elseif self:fight_enemy() then
     end
   end
 end
@@ -685,6 +687,30 @@ function _unit:use_resources(rel_x, rel_y)
   return false
 end
 
+function _unit:fight_enemy()
+  for unit in all(units) do
+    if unit.owner ~= self.owner and mdst(unit, self) <= 8 then
+      self:consume()
+      local count = self:act(self.fight)
+      unit.health -= count
+      return
+    end
+  end
+
+  for house in all(houses) do
+    local range = 8
+    if house.type == h.castle then
+      range = 16
+    end
+    if house.owner ~= self.owner and mdst(house, self) <= range then
+      self:consume()
+      local count = self:act(self.fight)
+      house.health -= count
+      return
+    end
+  end
+end
+
 
 -- house class
 -- houses are any building, but I'm not about to type 'building' a hundred times
@@ -692,6 +718,7 @@ _house = _sprite:extend()
 
 function _house:init(owner, x, y, type)
   self.__super.init(self, 0, x, y, pal_trans_red)
+  self.is_house = true
   self.type = type
   self.owner = owner
 
@@ -728,7 +755,9 @@ function _house:update()
 end
 
 function _house:draw()
-  pset(self.x, self.y, player_colors[self.owner])
+  if self ~= follow and self.type ~= h.castle then
+    pset(self.x, self.y, player_colors[self.owner])
+  end
 
   local fill = min(flr(self.action / self.cap * 8), 7)
   if fill > 0 then
@@ -1035,12 +1064,14 @@ function _info:draw()
 
   -- draw focused unit stats
   if follow ~= nil then
-    for i=1, follow.fight do
-      spr(t.ui_sword, ui_left + (i + follow.max_health) * 6 + 2, top + 6)
-    end
+    if follow.is_unit then
+      for i=1, follow.fight do
+        spr(t.ui_sword, ui_left + (i + follow.max_health) * 6 + 2, top + 6)
+      end
 
-    for i=1, follow.gather do
-      spr(t.ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 + 6, top + 6)
+      for i=1, follow.gather do
+        spr(t.ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 + 6, top + 6)
+      end
     end
 
     -- hearts need a wacky palette swap
@@ -1096,6 +1127,7 @@ function init_players()
     local x = flr(rnd(120)) + 4
     local y = flr(rnd(56)) + 4
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
+    local castle = _house(p, x * 8 + 4, y * 8 + 4, h.castle)
 
     local ter = flr(x / 32)
     -- flip them because i drew the map wrong
@@ -1112,6 +1144,7 @@ function init_players()
     mset(x + 1, y + 1, t.ter_castle4 + ter * 16)
 
     add(units, worker)
+    add(houses, castle)
     add(order, p)
     add(players, {
       castle_x=x,
@@ -1157,9 +1190,10 @@ function jump_to_closest_unit()
 end
 
 -- move the cursor to the next unit (undefined behavior if no unit is under the cursor)
-function jump_to_next_unit()
+function jump_to_next_unit(list)
+  list = list or units
   local i = 0
-  for unit in all(units) do
+  for unit in all(list) do
     local unit_dist = mdst(unit, curs)
     i += 1
 
@@ -1169,9 +1203,9 @@ function jump_to_next_unit()
   end
 
   -- decide the next unit
-  local unit = units[i + 1]
-  if i == #units then
-    unit = units[1]
+  local unit = list[i + 1]
+  if i == #list then
+    unit = list[1]
   end
 
   -- move cursor to unit
@@ -1181,10 +1215,11 @@ function jump_to_next_unit()
 end
 
 -- move the cursor to the previous unit (undefined behavior if no unit is under the cursor)
-function jump_to_prev_unit()
+function jump_to_prev_unit(list)
+  list = list or units
   -- find the unit we're selecting
   local i = 0
-  for unit in all(units) do
+  for unit in all(list) do
     local unit_dist = mdst(unit, curs)
     i += 1
 
@@ -1194,9 +1229,9 @@ function jump_to_prev_unit()
   end
 
   -- decide the previous unit
-  local unit = units[i - 1]
+  local unit = list[i - 1]
   if i == 1 then
-    unit = units[#units]
+    unit = list[#list]
   end
 
   -- move cursor to unit
@@ -1348,19 +1383,20 @@ function make_base_menu()
   menu:clear()
 
   if follow ~= nil and follow.owner == cur_player then
-    menu:add("move", function()
-      change_state("move")
-    end)
+    if follow.is_unit then
+      menu:add("move", function()
+        change_state("move")
+      end)
 
-    if follow.type == u.worker then
-      menu:add("build", make_build_menu)
+      if follow.type == u.worker then
+        menu:add("build", make_build_menu)
+      end
+
+    elseif follow.is_house then
+      if follow.type == h.castle then
+        menu:add("hire", make_hire_menu)
+      end
     end
-  end
-
-  local cx = flr(curs.x / 8)
-  local cy = flr(curs.y / 8)
-  if (cx == player.castle_x or cx == player.castle_x + 1) and (cy == player.castle_y or cy == player.castle_y + 1) then
-    menu:add("hire", make_hire_menu)
   end
 
   menu:add("end turn", next_turn)
@@ -1430,11 +1466,16 @@ function _update()
   if state == s.splash then
     cam:move(0, 0)
   elseif state == s.command or state == s.play then
+    local move_amt = 8
+    if follow and follow.is_house and follow.type == h.castle then
+      move_amt = 12
+    end
+
     if btnp(b.left) then
       if btns[b.o] then
         jump_to_prev_unit()
       else
-        curs:dmove(-8, 0)
+        curs:dmove(-move_amt, 0)
       end
     end
 
@@ -1442,23 +1483,23 @@ function _update()
       if btns[b.o] then
         jump_to_next_unit()
       else
-        curs:dmove(8, 0)
+        curs:dmove(move_amt, 0)
       end
     end
 
     if btnp(b.up) then
       if btns[b.o] then
-        jump_to_prev_building()
+        jump_to_prev_unit(houses)
       else
-        curs:dmove(0, -8)
+        curs:dmove(0, -move_amt)
       end
     end
 
     if btnp(b.down) then
       if btns[b.o] then
-        jump_to_next_building()
+        jump_to_next_unit(houses)
       else
-        curs:dmove(0, 8)
+        curs:dmove(0, move_amt)
       end
     end
 
@@ -1467,6 +1508,22 @@ function _update()
       if flr(unit.x) == flr(curs.x) and flr(unit.y) == flr(curs.y) then
         follow = unit
         break
+      end
+    end
+
+    if follow == nil then
+      for house in all(houses) do
+        if house.type == h.castle then
+          if mdst(curs, house) <= 8 then
+            follow = house
+            break
+          end
+        end
+
+        if flr(house.x) == flr(curs.x) and flr(house.y) == flr(curs.y) then
+          follow = house
+          break
+        end
       end
     end
 
@@ -1573,6 +1630,12 @@ function _update()
       house:update()
       if house.health <= 0 then
         del(houses, house)
+
+        -- reset terrain to neutral
+        local cell_x = flr(house.x / 8)
+        local cell_y = flr(house.y / 8)
+        local cell_n = mget(cell_x, cell_y)
+        mset(cell_x, cell_y, flr(cell_n / 16) * 16)
       end
     end
 
@@ -1724,8 +1787,8 @@ __gfx__
 00000000000888888888888800666005000000050066600000000000500000008888888888888888888888880000000085588558000000000000000000000000
 00000000060000000000000006ee76050000000506ee760000000000850000008894496888944968889449680000000085655658000000000000000000000000
 00000000000888888888888806eee6050000000506eee60000000000885000008840406888404068884040680000000085d6dd58000000000000000000000000
-00000000808888888888888806eee6050000000506eee60000000000888500008dd404188dd404188dd404180000000088566588000000000000000000000000
-00000000808888888888888800666050000000500066600000000000888850008dd444888dd444888dd4448800000000885d6588000000000000000000000000
+00000000808888888888888806eee6050000000506eee60000000000888500008664041886640418866404180000000088566588000000000000000000000000
+000000008088888888888888006660500000005000666000000000008888500086644488866444888664448800000000885d6588000000000000000000000000
 00000000000888888888888800000500000005000000000000000000888885008849948888499488884994880000000085666658000000000000000000000000
 00000000060000000000000000005000000050000000000055555555888888558848848888488888888884880000000085d6dd58000000000000000000000000
 00000000000888888888888855555555555555555555555588888888888888888888888888888888888888880000000056666665000000000000000000000000
@@ -1745,38 +1808,38 @@ __gfx__
 00000000844488888889988888448888444444448499948884488888844888880000000000000000000000000000000000000000000000000000000000000000
 00000000888888888888888888888888444444448888888888888888888888880000000000000000000000000000000000000000000000000000000000000000
 00000000888888888888888888888888444444448888888888888888888888880000000000000000000000000000000000000000000000000000000000000000
-333333333333333333333333333333333333333333333333333333333333333333335535535533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
-3333333333bb333333bbbb3333344333333bb33333333333333333333333333333335555555533333335d6dd6dd65333bbbbbbbbbbbbbbbbbbbbbbbbbbb333bb
-3333333333b333b33b2b2bb33344443333bbbb3333333333333333333333333333335666666533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbb33338333
-3333333333333bb33bbbb2b33399993333bbbb3333333333333333333333333333335dd6dd6533333355dd6dd6dd5533bbbbbbbbbbbb3333bbb3333b38388383
-333333333b3333333b2bbbb3334444333bbbbbb333333333333333333333333333e45661166533333356666446666533bbbbbbbbbb3334433333003389898883
-333333333bb33b3333bb2b3333999933333443333333333333333333333333333ee45d1ff1d53333335d6d44446dd533bbbbbbbb333440444444000899999883
-3333333333333bb3333bb333334444333334433333333333333333333333333333e4561ff16533333556664444666553bbb333333444400044445029aaa99983
-333333333333333333333333333333333333333333333333333333333333333333355d1111655333556dd64444dd6d55bbb34445444444044444459aaaaaa983
-ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff55f55f55fffffff5666666665fffbbb3400444444444444459a7777aa983
-ffffffffff9ff9ffffbb8fffffffffffff3333ffffffffffffffffffffffffffffff55555555fffffff5d6dd6dd65fffbbb340444444444455559a77777aa933
-fffffffff9f9ff9fff8bbf8ffff55ffff333333fffffffffffffffffffffffffffff56666665fffffff5666666665fffbbb34444444444457667a77777aa993b
-fffffffffffff9fffffbffb8ff7ee7fff333333fffffffffffffffffffffffffffff5dd6dd65ffffff55dd6dd6dd55ffbb3344444444444deeee77777aaa993b
-fffffffffff9fffffbbbfbbfff7ee7ffff3333ffffffffffffffffffffffffffffe456611665ffffff566664466665ffb33444444444444deeee6aaaaaa9933b
-ffffffffff9ff9fff8fbbbffff7ee7fffff55ffffffffffffffffffffffffffffee45d1ff1d5ffffff5d6d44446dd5ff3344444444444445deed5444999933bb
-fffffffffff9ff9fffffbfffff7777fffff55fffffffffffffffffffffffffffffe4561ff165fffff55666444466655f34444444444444447ee7444433333bbb
-fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff55d1111655fff556dd64444dd6d553444444444444444566544443bbbbbbb
-dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd55d55d55ddddddd5666666665ddd4444444444444444444444443bbbbbbb
-dddddddddddd5ddddddccddddddccddddddddddddddddddddddddddddddddddddddd55555555ddddddd5d6dd6dd65ddd4444444444444444444444443bbbbbbb
-dddddddddd5dddddddccccddddc7ccddddd5dddddddddddddddddddddddddddddddd56666665ddddddd5666666665ddd4444444444444444444444333bbbbbbb
-ddddddddddddd5ddddcc1ccdddcc7cdddd555ddddddddddddddddddddddddddddddd5dd6dd65dddddd55dd6dd6dd55dd44444444444444444444443bbbbbbbbb
-ddddddddd5dddddddcc111cddd7cc7dddd5555dddddddddddddddddddddddddddde456611665dddddd566664466665dd44444444444444444444433bbbbbbbbb
-dddddddddddd5ddddcc11cddddc7ccddd555555ddddddddddddddddddddddddddee45d1ff1d5dddddd5d6d44446dd5dd44444444444444444444433bbbbbbbbb
-dddddddddd5ddd5dddccccdddddc7dddd555555ddddddddddddddddddddddddddde4561ff165ddddd55666444466655d44444444444444444444443bbbbbbbbb
-ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd55d1111655ddd556dd64444dd6d5544444444444444444444443bbbbbbbbb
-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55b55b55bbbbbbb5666666665bbb444444444444444444444443bbbbbbbb
-bbbbbbbbb6bbbb6bbbb9bbbbbb8eeebbbbbebebbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55555555bbbbbbb5d6dd6dd65bbb444444444444444444444443bbbbbbbb
-bbbbbbbbbbbb6bbbb9b3b9bbbb887ebbbbeeeebbbbbbbbbbbbbbbbbbbbbbbbbbbbbb56666665bbbbbbb5666666665bbb4444444444444444444444433bbbbbbb
-bbbbbbbbbbbbbbbbbb3bb3bbbb888ebbbeeeeeebbbbbbbbbbbbbbbbbbbbbbbbbbbbb5dd6dd65bbbbbb55dd6dd6dd55bb4444444444444444444444443bbbbbbb
-bbbbbbbbbbb6bbbbbb3bb3bbbbd888bbbbeeeebbbbbbbbbbbbbbbbbbbbbbbbbbbbe456611665bbbbbb566664466665bb4444444444444444444444443bbbbbbb
-bbbbbbbbbbbbbb6bbb3b3bbbbbbd8bbbbbb44bbbbbbbbbbbbbbbbbbbbbbbbbbbbee45d1ff1d5bbbbbb5d6d44446dd5bb44444444444444444444444433bbbbbb
-bbbbbbbbb6bbbbbbbb3b3bbbbbbbbbbbbbb44bbbbbbbbbbbbbbbbbbbbbbbbbbbbbe4561ff165bbbbb55666444466655b44444444444444444444444443bbbbbb
-bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb55d1111655bbb556dd64444dd6d5544444444444444444444444443bbbbbb
+333333333333333333333333333333333333333333333333000000000000000033335535535533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+3333333333bb333333bbbb3333344333333bb33333333333000000000000000033335555555533333335d6dd6dd65333bbbbbbbbbbbbbbbbbbbbbbbbbbb333bb
+3333333333b333b33b2b2bb33344443333bbbb3333333333000000000000000033335666666533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbb33338333
+3333333333333bb33bbbb2b33399993333bbbb3333333333000000000000000033335dd6dd6533333355dd6dd6dd5533bbbbbbbbbbbb3333bbb3333b38388383
+333333333b3333333b2bbbb3334444333bbbbbb333333333000000000000000033e45661166533333356666446666533bbbbbbbbbb3334433333003389898883
+333333333bb33b3333bb2b3333999933333443333333333300000000000000003ee45d1ff1d53333335d6d44446dd533bbbbbbbb333440444444000899999883
+3333333333333bb3333bb333334444333334433333333333000000000000000033e4561ff16533333556664444666553bbb333333444400044445029aaa99983
+333333333333333333333333333333333333333333333333000000000000000033355d1111655333556dd64444dd6d55bbb34445444444044444459aaaaaa983
+ffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000ffff55f55f55fffffff5666666665fffbbb3400444444444444459a7777aa983
+ffffffffff9ff9ffffbb8fffffffffffff3333ffffffffff0000000000000000ffff55555555fffffff5d6dd6dd65fffbbb340444444444455559a77777aa933
+fffffffff9f9ff9fff8bbf8ffff55ffff333333fffffffff0000000000000000ffff56666665fffffff5666666665fffbbb34444444444457667a77777aa993b
+fffffffffffff9fffffbffb8ff7ee7fff333333fffffffff0000000000000000ffff5dd6dd65ffffff55dd6dd6dd55ffbb3344444444444deeee77777aaa993b
+fffffffffff9fffffbbbfbbfff7ee7ffff3333ffffffffff0000000000000000ffe456611665ffffff566664466665ffb33444444444444deeee6aaaaaa9933b
+ffffffffff9ff9fff8fbbbffff7ee7fffff55fffffffffff0000000000000000fee45d1ff1d5ffffff5d6d44446dd5ff3344444444444445deed5444999933bb
+fffffffffff9ff9fffffbfffff7777fffff55fffffffffff0000000000000000ffe4561ff165fffff55666444466655f34444444444444447ee7444433333bbb
+ffffffffffffffffffffffffffffffffffffffffffffffff0000000000000000fff55d1111655fff556dd64444dd6d553444444444444444566544443bbbbbbb
+dddddddddddddddddddddddddddddddddddddddddddddddd0000000000000000dddd55d55d55ddddddd5666666665ddd4444444444444444444444443bbbbbbb
+dddddddddddd5ddddddccddddddccddddddddddddddddddd0000000000000000dddd55555555ddddddd5d6dd6dd65ddd4444444444444444444444443bbbbbbb
+dddddddddd5dddddddccccddddc7ccddddd5dddddddddddd0000000000000000dddd56666665ddddddd5666666665ddd4444444444444444444444333bbbbbbb
+ddddddddddddd5ddddcc1ccdddcc7cdddd555ddddddddddd0000000000000000dddd5dd6dd65dddddd55dd6dd6dd55dd44444444444444444444443bbbbbbbbb
+ddddddddd5dddddddcc111cddd7cc7dddd5555dddddddddd0000000000000000dde456611665dddddd566664466665dd44444444444444444444433bbbbbbbbb
+dddddddddddd5ddddcc11cddddc7ccddd555555ddddddddd0000000000000000dee45d1ff1d5dddddd5d6d44446dd5dd44444444444444444444433bbbbbbbbb
+dddddddddd5ddd5dddccccdddddc7dddd555555ddddddddd0000000000000000dde4561ff165ddddd55666444466655d44444444444444444444443bbbbbbbbb
+dddddddddddddddddddddddddddddddddddddddddddddddd0000000000000000ddd55d1111655ddd556dd64444dd6d5544444444444444444444443bbbbbbbbb
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0000000000000000bbbb55b55b55bbbbbbb5666666665bbb444444444444444444444443bbbbbbbb
+bbbbbbbbb6bbbb6bbbb9bbbbbb8eeebbbbbebebbbbbbbbbb0000000000000000bbbb55555555bbbbbbb5d6dd6dd65bbb444444444444444444444443bbbbbbbb
+bbbbbbbbbbbb6bbbb9b3b9bbbb887ebbbbeeeebbbbbbbbbb0000000000000000bbbb56666665bbbbbbb5666666665bbb4444444444444444444444433bbbbbbb
+bbbbbbbbbbbbbbbbbb3bb3bbbb888ebbbeeeeeebbbbbbbbb0000000000000000bbbb5dd6dd65bbbbbb55dd6dd6dd55bb4444444444444444444444443bbbbbbb
+bbbbbbbbbbb6bbbbbb3bb3bbbbd888bbbbeeeebbbbbbbbbb0000000000000000bbe456611665bbbbbb566664466665bb4444444444444444444444443bbbbbbb
+bbbbbbbbbbbbbb6bbb3b3bbbbbbd8bbbbbb44bbbbbbbbbbb0000000000000000bee45d1ff1d5bbbbbb5d6d44446dd5bb44444444444444444444444433bbbbbb
+bbbbbbbbb6bbbbbbbb3b3bbbbbbbbbbbbbb44bbbbbbbbbbb0000000000000000bbe4561ff165bbbbb55666444466655b44444444444444444444444443bbbbbb
+bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb0000000000000000bbb55d1111655bbb556dd64444dd6d5544444444444444444444444443bbbbbb
 04040404040404042404040404040404040404040404040404040404040404040606060606060606060606060606060606060606060606060606060606060606
 05050505050505050505050505050505050505050505050505050505050505050707070707070707070707070707070707070707070707070707071707070707
 04040404040404040404040404040404040404040404040404040404040404040606060606160606060606060606060606060616060606060606060606060606
