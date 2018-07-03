@@ -1471,17 +1471,21 @@ function _draw()
     for i=min_players, max_players do
       local col = c.lightgrey
       if i == num_players then
-        col = c.white
+        col = player_colors[i]
       end
       print(i .. "p", i * 16 - 4, 64, col)
     end
 
     local col = c.lightgrey
-    if btn(b.o) or btn(b.x) then
-      col = c.white
+    print("press \142+\151", 43, 80, col)
+
+    if btn(b.x) then
+      print("         \151", 43, 80, c.white)
     end
 
-    print("press \151 + \142", 39, 80, col)
+    if btn(b.o) then
+      print("      \142", 43, 80, c.white)
+    end
 
     if btnp(b.left) then
       num_players = max(num_players - 1, min_players)
