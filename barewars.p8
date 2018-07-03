@@ -901,9 +901,9 @@ function _info:draw()
 
   if res then
     local offx = 0
-    if res > 100 then
+    if res >= 100 then
       offx = -8
-    elseif res > 10 then
+    elseif res >= 10 then
       offx = -4
     end
     print(res, ui_right + offx, top + 7, c.white)
