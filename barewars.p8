@@ -552,6 +552,7 @@ function _unit:update()
   self.__super.update(self)
   self:consume()
 
+  -- movement
   local path = self.path
   if path and #path > 0 then
     self:consume()
@@ -585,15 +586,14 @@ function _unit:update()
       end
     end
 
-    -- consume resources
-
-  else
-    local res = get_resources(self.ctx, self.cty)
-    if self.x == self.tx and self.y == self.ty and res and res > 0 then
-      self:consume()
-      use_resource(self.ctx, self.cty, self.owner)
+  -- perform actions
+  elseif self.x == self.tx and self.y == self.ty then
+    -- this is wacky but it works
+    if self:use_resources(-1, 0) then
+    elseif self:use_resources(0, -1) then
+    elseif self:use_resources(1, 0) then
+    elseif self:use_resources(0, 1) then
     end
-
   end
 end
 
@@ -627,6 +627,17 @@ function _unit:get_path()
   local cur_x = flr(self.x / 8)
   local cur_y = flr(self.y / 8)
   return get_path(cur_x, cur_y, self.ctx, self.cty)
+end
+
+function _unit:use_resources(rel_x, rel_y)
+  local res = get_resources(self.ctx + rel_x, self.cty + rel_y)
+  if res and res > 0 then
+    self:consume()
+    use_resource(self.ctx + rel_x, self.cty + rel_y, self.owner)
+    return true
+  end
+
+  return false
 end
 
 -- menu class
@@ -1169,6 +1180,10 @@ resources = {}
 
 -- return the resources left on a node, generating if necessary
 function get_resources(x, y)
+  if x < 0 or y < 0 or x >= 1024 or y >= 64 then
+    return nil
+  end
+
   local cell = mget(x, y)
   local is_resource = fget(cell, f.food) or fget(cell, f.money) or fget(cell, f.material)
   local key = coord_key(x, y)
@@ -1376,8 +1391,7 @@ function _update()
     end
 
     if not check_cell(flr(curs.x / 8), flr(curs.y / 8)) then
-      -- fixme for warriors
-      -- curs.palette = pal_bad_curs
+      curs.palette = pal_bad_curs
     end
 
     if btnp(b.x) then
