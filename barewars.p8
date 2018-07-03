@@ -110,8 +110,8 @@ u = {
 
 -- unit costs
 uc = {
-  [u.worker]=20,
-  [u.warrior]=20,
+  [u.worker]=6,
+  [u.warrior]=8,
 }
 
 -- unit stats
@@ -130,9 +130,9 @@ h = {
 
 -- house costs
 hc = {
-  [h.wall]=80,
-  [h.cave]=120,
-  [h.tower]=200,
+  [h.wall]=4,
+  [h.cave]=10,
+  [h.tower]=10,
 }
 
 -- house stats
@@ -1082,8 +1082,6 @@ function init_players()
     local x = flr(rnd(120)) + 4
     local y = flr(rnd(56)) + 4
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
-    local cave = _house(p, x * 8 - 8, y * 8, h.cave)
-    local tower = _house(p, x * 8 + 16, y * 8, h.tower)
 
     local ter = flr(x / 32)
     -- flip them because i drew the map wrong
@@ -1100,8 +1098,6 @@ function init_players()
     mset(x + 1, y + 1, t.ter_castle4 + ter * 16)
 
     add(units, worker)
-    add(houses, cave)
-    add(houses, tower)
     add(order, p)
     add(players, {
       castle_x=x,
@@ -1319,6 +1315,16 @@ function hire_unit(unit_type)
   change_state(prev_state)
 end
 
+-- build a new house
+function build_house(house_type, owner, x, y)
+  local player = players[owner]
+  local new = _house(owner, x * 8, y * 8, house_type)
+  player.materials -= hc[house_type]
+
+  add(houses, new)
+  change_state(prev_state)
+end
+
 -- make the base menu when clicking from command mode
 function make_base_menu()
   local player = players[cur_player]
@@ -1346,17 +1352,25 @@ end
 function make_build_menu()
   local player = players[cur_player]
   menu:clear()
-  menu:add("wall", function() end, player.materials > hc[h.wall] and false)
-  menu:add("cave", function() end, player.materials > hc[h.cave] and false)
-  menu:add("tower", function() end, player.materials > hc[h.tower] and false)
   menu.back = make_base_menu
+
+  local curs_x = flr(curs.x / 8)
+  local curs_y = flr(curs.y / 8)
+  if not check_cell(curs_x, curs_y - 1) then
+    menu:add("can't build here", function() end, false)
+    return
+  end
+
+  menu:add(hc[h.wall] .. " wall", function() build_house(h.wall, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.wall])
+  menu:add(hc[h.cave] .. " cave", function() build_house(h.cave, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.cave])
+  menu:add(hc[h.tower] .. " tower", function() build_house(h.tower, cur_player, curs_x, curs_y - 1) end, player.materials > hc[h.tower])
 end
 
 function make_hire_menu()
   local player = players[cur_player]
   menu:clear()
-  menu:add("worker", function() hire_unit(u.worker) end, player.money > uc[u.worker])
-  menu:add("warrior", function() hire_unit(u.warrior) end, player.money > uc[u.warrior])
+  menu:add(uc[u.worker] .. " worker", function() hire_unit(u.worker) end, player.money > uc[u.worker])
+  menu:add(uc[u.warrior] .. " warrior", function() hire_unit(u.warrior) end, player.money > uc[u.warrior])
   menu.back = make_base_menu
 end
 
