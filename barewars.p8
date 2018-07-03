@@ -135,12 +135,12 @@ hc = {
   [h.tower]=200,
 }
 
--- house sprites
+-- house stats
 hs = {
-  [h.castle]=t.blank,
-  [h.wall]=t.wall,
-  [h.tower]=t.tower,
-  [h.cave]=t.cave,
+  [h.castle] = {tile=t.blank, health=32, cap=16},
+  [h.wall] = {tile=t.wall, health=8, speed=0},
+  [h.tower] = {tile=t.tower, health=16, cap=8},
+  [h.cave] = {tile=t.cave, health=16, cap=256},
 }
 
 
@@ -684,9 +684,14 @@ function _house:init(owner, x, y, type)
   self.__super.init(self, 0, x, y, pal_trans_red)
   self.type = type
   self.owner = owner
-  self.health = 16
 
-  self.tile = hs[self.type]
+  local stats = hs[self.type]
+  self.tile = stats.tile
+  self.health = stats.health
+  self.max_health = stats.health
+  self.action = 0
+  self.cap = stats.cap or 32
+  self.speed = stats.speed or 1
   self.mx = flr(x / 8)
   self.my = flr(y / 8)
 
@@ -702,9 +707,28 @@ function _house:init(owner, x, y, type)
   end
 end
 
+function _house:update()
+  if self.action < self.cap then
+    self.action += self.speed
+  end
+
+  if self.action >= self.cap then
+    self:act()
+  end
+end
+
 function _house:draw()
   pset(self.x, self.y, player_colors[self.owner])
+
+  local fill = min(flr(self.action / self.cap * 8), 7)
+  if fill > 0 then
+    line(self.x, self.y + 7, self.x + fill, self.y + 7, c.orange)
+  end
+
   self.__super.draw(self)
+end
+
+function _house:act()
 end
 
 
