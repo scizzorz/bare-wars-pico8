@@ -40,6 +40,7 @@ s = {
   play=2,
   menu=3,
   move=4,
+  win=5,
 }
 
 -- tiles
@@ -1281,10 +1282,12 @@ end
 -- change the state, recording the previous one as well
 function change_state(to)
   if type(to) == "string" then
+    printh("changing state to '" .. to .. "'")
     to = s[to]
   else
     for k, v in pairs(s) do
       if v == to then
+        printh("changing state to " .. k)
         break
       end
     end
@@ -1299,20 +1302,50 @@ function next_turn()
   turn_idx += 1
 
   for p=1, num_players do
-    local owned = 0
+    local owned_units = 0
+    local owned_houses = 0
+    local castle_alive = false
+
     for unit in all(units) do
       if unit.owner == p then
-        owned += 1
+        owned_units += 1
       end
     end
 
-    players[p].units = owned
+    for house in all(houses) do
+      if house.owner == p then
+        if house.type == h.castle then
+          castle_alive = true
+        end
+        owned_houses += 1
+      end
+    end
+
+    players[p].units = owned_units
+    players[p].houses = owned_houses
+    players[p].castle_alive = castle_alive
   end
 
   for p in all(order) do
-    if players[p].units == 0 then
+    if players[p].units == 0 or not players[p].castle_alive then
       del(order, p)
+      for unit in all(units) do
+        if unit.owner == p then
+          del(units, unit)
+        end
+      end
+
+      for house in all(houses) do
+        if house.owner == p then
+          del(houses, house)
+        end
+      end
     end
+  end
+
+  if #order == 1 then
+    change_state("win")
+    return
   end
 
   -- move to next player
@@ -1463,8 +1496,10 @@ function _update()
   pbtns = btns
   btns = {[0]=btn(0), [1]=btn(1), [2]=btn(2), [3]=btn(3), [4]=btn(4), [5]=btn(5)}
 
-  if state == s.splash then
-    cam:move(0, 0)
+  if state == s.splash or state == s.win then
+    cam.x = 0
+    cam.y = 0
+
   elseif state == s.command or state == s.play then
     local move_amt = 8
     if follow and follow.is_house and follow.type == h.castle then
@@ -1646,7 +1681,7 @@ function _update()
     end
   end
 
-  if state ~= s.splash and state ~= s.done then
+  if state ~= s.splash and state ~= s.win then
     if curs.x < 0 then
       curs.x = 0
     end
@@ -1679,8 +1714,9 @@ function _draw()
   cls()
   cam:draw()
 
-  if state == s.splash then
+  if state == s.splash or state == s.win then
     rectfill(0, 0, 128, 128, c.darkgrey)
+    palt()
     palt(c.black, false)
     palt(c.green, true)
     spr(76, 0, 96)
@@ -1700,40 +1736,65 @@ function _draw()
     spr(126, 16, 120)
     spr(127, 24, 120)
 
-    print("bare wars", 47, 48, c.lightgrey)
+    if state == s.splash then
+      print("bare wars", 47, 48, c.lightgrey)
 
-    for i=min_players, max_players do
-      local col = c.lightgrey
-      if i == num_players then
-        col = player_colors[i]
+      for i=min_players, max_players do
+        local col = c.lightgrey
+        if i == num_players then
+          col = player_colors[i]
+        end
+        print(i .. "p", i * 16 - 4, 64, col)
       end
-      print(i .. "p", i * 16 - 4, 64, col)
+
+      print("press \142+\151", 43, 80, c.lightgrey)
+
+      if btnp(b.left) then
+        num_players = max(num_players - 1, min_players)
+        sfx(a.ping)
+      end
+
+      if btnp(b.right) then
+        num_players = min(num_players + 1, max_players)
+        sfx(a.ping)
+      end
+
+      if btn(b.o) and btn(b.x) then
+        init_players()
+        change_state("command")
+      end
+
+    elseif state == s.win then
+      printh("victory for " .. order[1])
+      print("victory", 47, 48, c.lightgrey)
+
+      for i=1, num_players do
+        local col = c.indigo
+        if i == order[1] then
+          col = player_colors[i]
+        end
+        print(i, i * 16 - 4, 64, col)
+      end
+
+      cam:update()
+      print("reset \142+\151", 43, 80, c.lightgrey)
+
+      if btn(b.o) and btn(b.x) then
+        run()
+      end
     end
 
-    print("press \142+\151", 43, 80, c.lightgrey)
-
     local col = player_colors[num_players]
+    if state == s.win then
+      col = player_colors[order[1]]
+    end
+
     if btn(b.x) then
       print("         \151", 43, 80, col)
     end
 
     if btn(b.o) then
       print("      \142", 43, 80, col)
-    end
-
-    if btnp(b.left) then
-      num_players = max(num_players - 1, min_players)
-      sfx(a.ping)
-    end
-
-    if btnp(b.right) then
-      num_players = min(num_players + 1, max_players)
-      sfx(a.ping)
-    end
-
-    if btn(b.o) and btn(b.x) then
-      change_state("command")
-      init_players()
     end
 
   else
