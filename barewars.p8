@@ -954,9 +954,6 @@ function _info:draw()
   end
 
   local player = players[player_num]
-  if player == nil then
-    return
-  end
 
   local ui_slot = 1
   for i=1, #order do
@@ -964,6 +961,10 @@ function _info:draw()
       ui_slot = i
       break
     end
+  end
+
+  if player == nil then
+    ui_slot = #order
   end
 
   for i=1, #units do
