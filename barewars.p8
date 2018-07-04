@@ -590,7 +590,6 @@ function _unit:update()
   -- movement
   local path = self.path
   if path and #path > 0 then
-    self:consume()
     local waypoint = path[#path]
 
     -- move to waypoint
@@ -679,7 +678,6 @@ end
 function _unit:use_resources(rel_x, rel_y)
   local res = get_resources(self.ctx + rel_x, self.cty + rel_y)
   if res and res > 0 then
-    self:consume()
     local count = self:act(self.gather * 2)
     use_resource(self.ctx + rel_x, self.cty + rel_y, self.owner, count)
     return true
@@ -691,7 +689,6 @@ end
 function _unit:fight_enemy()
   for unit in all(units) do
     if unit.owner ~= self.owner and mdst(unit, self) <= 8 then
-      self:consume()
       local count = self:act(self.fight)
       unit.health -= count
       return
@@ -704,7 +701,6 @@ function _unit:fight_enemy()
       range = 16
     end
     if house.owner ~= self.owner and mdst(house, self) <= range then
-      self:consume()
       local count = self:act(self.fight)
       house.health -= count
       return
