@@ -1685,9 +1685,7 @@ function _update()
     local dist = mdst(curs, sel_curs)
     if dist > 64 then
       curs.palette = pal_bad_curs
-      if btnp(b.left) or btnp(b.right) or btnp(b.up) or btnp(b.down) then
-        follow:set_dest(follow.x, follow.y)
-      end
+      follow:set_dest(follow.x, follow.y)
     else
       curs.palette = pal_trans_red
       if btnp(b.left) or btnp(b.right) or btnp(b.up) or btnp(b.down) then
@@ -1697,6 +1695,7 @@ function _update()
 
     if not check_cell(flr(curs.x / 8), flr(curs.y / 8)) then
       curs.palette = pal_bad_curs
+      follow:set_dest(follow.x, follow.y)
     end
 
     if btnp(b.x) then
