@@ -1872,6 +1872,13 @@ function _draw()
       sel_curs:draw()
     end
 
+    if state == s.move then
+      if follow.path then
+        rectfill(curs.x + 9, curs.y, curs.x + 13, curs.y + 6, c.darkgrey)
+        print(#follow.path, curs.x + 10, curs.y + 1, c.white)
+      end
+    end
+
     if state == s.menu or state == s.command or state == s.move or state == s.play then
       player_ui:draw()
     end
