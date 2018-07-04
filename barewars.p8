@@ -639,11 +639,17 @@ end
 function _unit:draw()
   local path = self.path
   if path and #path > 0 then
-    line(self.x + 4, self.y + 4, path[#path][1] * 8 + 4, path[#path][2] * 8 + 4, c.yellow)
+    local col = player_colors[self.owner]
+    line(self.x + 4, self.y + 4, path[#path][1] * 8 + 4, path[#path][2] * 8 + 4, col)
     for coord=1,#path-1 do
-      line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, c.yellow)
+      line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, col)
     end
+
+    local last_x = path[1][1] * 8 + 3
+    local last_y = path[1][2] * 8 + 3
+    rectfill(last_x, last_y, last_x + 2, last_y + 2, col)
   end
+
   if self ~= follow then
     --[[ health bar?
     local col = c.darkpurple
