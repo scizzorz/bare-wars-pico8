@@ -1442,7 +1442,9 @@ function make_base_menu()
       end)
 
       if follow.type == u.worker then
-        menu:add("build", make_build_menu)
+        local curs_x = flr(curs.x / 8)
+        local curs_y = flr(curs.y / 8)
+        menu:add("build", make_build_menu, check_cell(curs_x, curs_y - 1))
       end
 
     elseif follow.is_house then
@@ -1467,10 +1469,6 @@ function make_build_menu()
 
   local curs_x = flr(curs.x / 8)
   local curs_y = flr(curs.y / 8)
-  if not check_cell(curs_x, curs_y - 1) then
-    menu:add("can't build here", function() end, false)
-    return
-  end
 
   menu:add(hc[h.wall] .. " wall", function()
     build_house(h.wall, cur_player, curs_x, curs_y - 1)
