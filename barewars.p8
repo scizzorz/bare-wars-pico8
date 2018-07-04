@@ -874,10 +874,21 @@ function _menu:draw()
 
   local px_width = 8 * width + 16
   local px_height = 8 * height + 16
-  local top = 4 + cam.y
+  local top = 16 + cam.y
   local left = 4 + cam.x
   local bottom = top + 8 * height
   local right = left + 8 + 8 * width
+
+  -- move out of way of cursor
+  if curs.x < right then
+    left += 116 - right
+    right += 116 - right
+  end
+
+  if curs.y < bottom then
+    top += 116 - bottom
+    bottom += 116 - bottom
+  end
 
   -- corners + fill
   spr(t.menu_corner, left, top, 1, 1, false, false)
