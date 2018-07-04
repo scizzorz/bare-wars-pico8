@@ -148,6 +148,8 @@ hs = {
   [h.farm] = {tile=t.farm, health=6, cap=64},
 }
 
+worker_range = 8
+
 function mset2(x, y, n)
   if y > 31 then
     x += 64
@@ -1683,7 +1685,7 @@ function _update()
     end
 
     local dist = mdst(curs, sel_curs)
-    if dist > 64 then
+    if dist > worker_range * 8 then
       curs.palette = pal_bad_curs
       follow:set_dest(follow.x, follow.y)
     else
@@ -1874,6 +1876,19 @@ function _draw()
       pset(player.castle_x * 8 + 2, player.castle_y * 8 + 6, player_colors[p])
     end
 
+    -- mark selectable cells
+    if state == s.move then
+      local mx = flr(follow.x / 8)
+      local my = flr(follow.y / 8)
+      for x=-8, 8 do
+        for y=-8, 8 do
+          if check_cell(mx + x, my + y) and abs(x) + abs(y) <= worker_range then
+            pset((mx + x) * 8 + 4, (my + y) * 8 + 4, c.lightgrey)
+          end
+        end
+      end
+    end
+
     for unit in all(units) do
       unit:draw()
     end
@@ -1889,6 +1904,7 @@ function _draw()
     end
 
     if state == s.move then
+      -- distance tooltip
       if follow.path then
         rectfill(curs.x + 9, curs.y, curs.x + 13, curs.y + 6, c.darkgrey)
         print(#follow.path, curs.x + 10, curs.y + 1, c.white)
