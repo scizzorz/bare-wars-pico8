@@ -809,6 +809,7 @@ function _house:act()
         sfx(a.bullet)
         unit.health -= 1
         self.action -= self.cap
+        return
       end
     end
   elseif self.type == h.cave then
