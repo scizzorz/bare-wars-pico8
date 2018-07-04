@@ -29,7 +29,6 @@ player_colors = {
 f = {
   solid=0,
   food=1,
-  money=2,
   material=3,
 }
 
@@ -78,7 +77,6 @@ t = {
   ui_mid_nogem=22,
   ui_corner=23,
   ui_food=49,
-  ui_money=50,
   ui_material=51,
   ui_heart=52,
   ui_unit=53,
@@ -1046,18 +1044,15 @@ function _info:draw()
     spr(t.ui_food, ui_left + 3, top - 1)
     print(player.food, ui_left + 10, top, c.white)
 
-    spr(t.ui_money, ui_left + 19, top - 1)
-    print(player.money, ui_left + 26, top, c.white)
+    spr(t.ui_material, ui_left + 19, top - 1)
+    print(player.materials, ui_left + 26, top, c.white)
 
-    spr(t.ui_material, ui_left + 36, top - 1)
-    print(player.materials, ui_left + 43, top, c.white)
-
-    spr(t.ui_house, ui_left + 70, top - 1)
-    print(player.houses, ui_left + 79, top, c.white)
+    spr(t.ui_house, ui_left + 53, top - 1)
+    print(player.houses, ui_left + 62, top, c.white)
 
     races[player.race]()
-    spr(t.ui_unit, ui_left + 53, top - 1)
-    print(player.units, ui_left + 61, top, c.white)
+    spr(t.ui_unit, ui_left + 36, top - 1)
+    print(player.units, ui_left + 44, top, c.white)
   end
 
   -- reset palette swaps
@@ -1076,8 +1071,6 @@ function _info:draw()
     spr(t.ui_food, ui_right + 4, top + 6)
   elseif fget(cell_n, f.material) then
     spr(t.ui_material, ui_right + 4, top + 6)
-  elseif fget(cell_n, f.money) then
-    spr(t.ui_money, ui_right + 4, top + 6)
   end
 
   if res then
@@ -1156,6 +1149,7 @@ function init_players()
     local y = flr(rnd(56)) + 4
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
     local castle = _house(p, x * 8 + 4, y * 8 + 4, h.castle)
+    local cave = _house(p, x * 8 + 16, y * 8, h.cave)
 
     local ter = flr(x / 32)
     -- flip them because i drew the map wrong
@@ -1173,12 +1167,12 @@ function init_players()
 
     add(units, worker)
     add(houses, castle)
+    add(houses, cave)
     add(order, p)
     add(players, {
       castle_x=x,
       castle_y=y,
       race=race,
-      money=0,
       materials=0,
       food=20,
       units=1,
@@ -1405,7 +1399,7 @@ function get_resources(x, y)
   end
 
   local cell = mget(x, y)
-  local is_resource = fget(cell, f.food) or fget(cell, f.money) or fget(cell, f.material)
+  local is_resource = fget(cell, f.food) or fget(cell, f.material)
   local key = coord_key(x, y)
   if is_resource and resources[key] == nil then
     resources[key] = flr(rnd(24) + 8)
@@ -1525,8 +1519,6 @@ function use_resource(x, y, owner, amt)
 
   if fget(cell, f.food) then
     player.food += amt
-  elseif fget(cell, f.money) then
-    player.money += amt
   elseif fget(cell, f.material) then
     player.materials += amt
   end
