@@ -113,8 +113,8 @@ u = {
 
 -- unit costs
 uc = {
-  [u.worker]=6,
-  [u.warrior]=8,
+  [u.worker]=10,
+  [u.warrior]=14,
 }
 
 -- unit stats
@@ -134,10 +134,10 @@ h = {
 
 -- house costs
 hc = {
-  [h.wall]=4,
-  [h.farm]=6,
-  [h.cave]=10,
-  [h.tower]=10,
+  [h.wall]=8,
+  [h.farm]=10,
+  [h.cave]=14,
+  [h.tower]=14,
 }
 
 -- house stats
