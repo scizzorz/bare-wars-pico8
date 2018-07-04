@@ -257,7 +257,7 @@ function contains(t,v)
 end
 
 function check_cell(x, y)
-  if x < 128 and x >= 0 and y < 64 and y >= 0 then
+  if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget(x, y)
     local is_solid = fget(n, f.solid)
     if not is_solid then
@@ -338,8 +338,8 @@ function _camera:move(x, y)
   if self.tx < 0 then
     self.tx = 0
   end
-  if self.tx > 897 then
-    self.tx = 897
+  if self.tx > 385 then
+    self.tx = 385
   end
   if self.ty < 0 then
     self.ty = 0
@@ -1394,7 +1394,7 @@ resources = {}
 
 -- return the resources left on a node, generating if necessary
 function get_resources(x, y)
-  if x < 0 or y < 0 or x >= 1024 or y >= 64 then
+  if x < 0 or y < 0 or x >= 64 or y >= 64 then
     return nil
   end
 
@@ -1732,8 +1732,8 @@ function _update()
     if curs.x < 0 then
       curs.x = 0
     end
-    if curs.x > 1016 then
-      curs.x = 1016
+    if curs.x > 504 then
+      curs.x = 504
     end
     if curs.y < 0 then
       curs.y = 0
@@ -1848,7 +1848,7 @@ function _draw()
     end
 
   else
-    map(0, 0, 0, 0, 128, 64)
+    map(0, 0, 0, 0, 64, 64)
 
     for p in all(order) do
       local player = players[p]
