@@ -1363,7 +1363,7 @@ function next_turn()
     end
   end
 
-  if #order == 1 then
+  if #order <= 1 then
     change_state("win")
     return
   end
@@ -1806,15 +1806,19 @@ function _draw()
       end
 
     elseif state == s.win then
-      print("victory", 50, 48, c.lightgrey)
+      if #order == 0 then
+        print("victory", 50, 48, c.lightgrey)
 
-      local off_x = 64 - num_players * 8 - 10
-      for i=1, num_players do
-        local col = c.indigo
-        if i == order[1] then
-          col = player_colors[i]
+        local off_x = 64 - num_players * 8 - 10
+        for i=1, num_players do
+          local col = c.indigo
+          if i == order[1] then
+            col = player_colors[i]
+          end
+          print(i, i * 16 + off_x, 64, col)
         end
-        print(i, i * 16 + off_x, 64, col)
+      else
+        print("draw", 60, 48, c.lightgrey)
       end
 
       print("reset \142+\151", 43, 80, c.lightgrey)
