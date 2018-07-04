@@ -19,10 +19,10 @@ c = {
 player_colors = {
   c.red,    -- 1
   c.blue,   -- 2
-  c.yellow, -- 3
-  c.green,  -- 4
-  c.orange, -- 5
-  c.pink,   -- 6
+  c.orange, -- 3
+  c.pink,   -- 4
+  c.yellow, -- 5
+  c.green,  -- 6
 }
 
 -- flags
