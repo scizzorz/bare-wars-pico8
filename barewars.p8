@@ -994,7 +994,7 @@ function _info:draw()
 
     pset(left, top, player_colors[houses[i].owner])
 
-    if house.action >= house.cap then
+    if (house.action >= house.cap) and (house.type == h.cave) then
       pset(left + 1, top, c.yellow)
     end
   end
