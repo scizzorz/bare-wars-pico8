@@ -1767,14 +1767,6 @@ function _update()
   end
 
   if state == s.play then
-    for unit in all(units) do
-      unit:update()
-      if unit.health <= 0 then
-        del(units, unit)
-        players[unit.owner].units -= 1
-      end
-    end
-
     for house in all(houses) do
       house:update()
       if house.health <= 0 then
@@ -1788,6 +1780,14 @@ function _update()
         local cell_y = flr(house.y / 8)
         local cell_n = mget2(cell_x, cell_y)
         mset2(cell_x, cell_y, flr(cell_n / 16) * 16)
+      end
+    end
+
+    for unit in all(units) do
+      unit:update()
+      if unit.health <= 0 then
+        del(units, unit)
+        players[unit.owner].units -= 1
       end
     end
 
