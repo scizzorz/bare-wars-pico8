@@ -1033,8 +1033,10 @@ function _info:draw()
     if order[p] == cur_player then
       border_col = c.lightgrey
     end
+
     pal(c.lightgrey, border_col)
     pal(c.pink, player_colors[order[p]])
+
     if p < ui_slot then
       spr(t.ui_left_gem, left + 8 * (p - 1), top)
     elseif p == ui_slot then
@@ -1134,6 +1136,21 @@ function _info:draw()
 
   pal()
   palt()
+
+  -- draw castle indicators
+  for p=1, #order do
+    local sx = cam.x + 64
+    local sy = cam.y + 64
+    local player = players[p]
+    local cx = player.castle_x * 8 + 8
+    local cy = player.castle_y * 8 + 8
+    if cx < cam.x or cy < cam.y or cx > cam.x + 128 or cy > cam.y + 128 then
+      local dir = atan2((cx - sx), (cy - sy))
+      local ox = flr(sx + cos(dir) * 50)
+      local oy = flr(sy + sin(dir) * 50)
+      pset(ox, oy, player_colors[p])
+    end
+  end
 end
 
 -- elements
