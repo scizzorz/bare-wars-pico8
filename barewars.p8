@@ -970,19 +970,33 @@ function _info:draw()
   for i=1, #units do
     local top = 6 + cam.y + 3 * i
     local left = 2 + cam.x
-    if follow == units[i] then
+    local unit = units[i]
+
+    if follow == unit then
       rectfill(left - 1, top - 1, left + 1, top + 1, c.darkgrey)
     end
+
     pset(left, top, player_colors[units[i].owner])
+
+    if unit.x ~= unit.tx or unit.y ~= unit.ty then
+      pset(left + 1, top, c.yellow)
+    end
+
   end
 
   for i=1, #houses do
     local top = 6 + cam.y + 3 * i
     local left = 5 + cam.x
-    if follow == houses[i] then
+    local house = houses[i]
+    if follow == house then
       rectfill(left - 1, top - 1, left + 1, top + 1, c.darkgrey)
     end
+
     pset(left, top, player_colors[houses[i].owner])
+
+    if house.action >= house.cap then
+      pset(left + 1, top, c.yellow)
+    end
   end
 
   local left = self.x + cam.x
