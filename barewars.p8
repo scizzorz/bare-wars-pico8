@@ -1342,10 +1342,8 @@ function change_state(to)
   state = to
 end
 
--- move to the next player, or start the play state
-function next_turn()
-  turn_idx += 1
-
+-- update owned counts
+function update_owned_counts()
   for p=1, num_players do
     local owned_units = 0
     local owned_houses = 0
@@ -1370,6 +1368,13 @@ function next_turn()
     players[p].houses = owned_houses
     players[p].castle_alive = castle_alive
   end
+end
+
+-- move to the next player, or start the play state
+function next_turn()
+  turn_idx += 1
+
+  update_owned_counts()
 
   for p in all(order) do
     if players[p].units == 0 or not players[p].castle_alive then
@@ -1377,12 +1382,14 @@ function next_turn()
       for unit in all(units) do
         if unit.owner == p then
           del(units, unit)
+          players[p].units -= 1
         end
       end
 
       for house in all(houses) do
         if house.owner == p then
           del(houses, house)
+          players[p].houses -= 1
         end
       end
     end
@@ -1442,6 +1449,7 @@ function hire_unit(unit_type, owner, x, y)
   local new = _unit(owner, x, y, races[player.race], unit_type)
 
   add(units, new)
+  player.units += 1
   change_state(prev_state)
   return new
 end
@@ -1452,7 +1460,9 @@ function build_house(house_type, owner, x, y)
   local new = _house(owner, x * 8, y * 8, house_type)
 
   add(houses, new)
+  player.houses += 1
   change_state(prev_state)
+  return new
 end
 
 -- make the base menu when clicking from command mode
@@ -1728,6 +1738,7 @@ function _update()
       unit:update()
       if unit.health <= 0 then
         del(units, unit)
+        players[unit.owner].units -= 1
       end
     end
 
@@ -1735,6 +1746,7 @@ function _update()
       house:update()
       if house.health <= 0 then
         del(houses, house)
+        houses[house.owner].houses -= 1
 
         -- reset terrain to neutral
         local cell_x = flr(house.x / 8)
