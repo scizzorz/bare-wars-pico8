@@ -1149,7 +1149,6 @@ function init_players()
     local y = flr(rnd(56)) + 4
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
     local castle = _house(p, x * 8 + 4, y * 8 + 4, h.castle)
-    local cave = _house(p, x * 8 + 16, y * 8, h.cave)
 
     local ter = flr(x / 32)
     -- flip them because i drew the map wrong
@@ -1167,7 +1166,6 @@ function init_players()
 
     add(units, worker)
     add(houses, castle)
-    add(houses, cave)
     add(order, p)
     add(players, {
       castle_x=x,
