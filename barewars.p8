@@ -1811,7 +1811,7 @@ function _draw()
       end
 
     elseif state == s.win then
-      if #order == 0 then
+      if #order == 1 then
         print("victory", 50, 48, c.lightgrey)
 
         local off_x = 64 - num_players * 8 - 10
