@@ -668,16 +668,14 @@ function _unit:draw()
   end
 
   if self ~= follow then
-    --[[ health bar?
-    local col = c.darkpurple
+    local col = c.pink
     for i=1,self.max_health do
-      pset(self.x + i, self.y, col)
+      pset(self.x + i - 1, self.y, col)
       if i == self.health then
         col = c.darkblue
       end
     end
-    ]]
-    pset(self.x, self.y, player_colors[self.owner])
+    pset(self.x, self.y + 7, player_colors[self.owner])
   end
 
   self.__super.draw(self)
@@ -786,7 +784,14 @@ end
 
 function _house:draw()
   if self ~= follow and self.type ~= h.castle then
-    pset(self.x, self.y, player_colors[self.owner])
+    local col = c.pink
+    for i=1,self.max_health do
+      pset(self.x + i - 1, self.y, col)
+      if i == self.health then
+        col = c.darkblue
+      end
+    end
+    pset(self.x, self.y + 6, player_colors[self.owner])
   end
 
   local fill = min(flr(self.action / self.cap * 8), 7)
