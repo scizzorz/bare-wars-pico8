@@ -766,6 +766,12 @@ function _house:init(owner, x, y, type)
   elseif cell_n <= 123 then
     mset2(self.mx, self.my, t.ter_wall + 48)
   end
+
+  for unit in all(units) do
+    if mdst(unit, self) <= worker_range * 10 then
+      unit:set_dest(unit.tx, unit.ty)
+    end
+  end
 end
 
 function _house:update()
