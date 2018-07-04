@@ -784,8 +784,6 @@ function _house:act()
       end
     end
   elseif self.type == h.cave then
-    self.action -= self.cap
-    local new = hire_unit(u.warrior, self.owner, self.x, self.y + 8)
   elseif self.type == h.farm then
     players[self.owner].food += 1
     self.action -= self.cap
@@ -1450,6 +1448,11 @@ function make_base_menu()
     elseif follow.is_house then
       if follow.type == h.castle then
         menu:add("hire", make_hire_menu)
+      elseif follow.type == h.cave then
+        menu:add("awaken", function()
+          follow.action -= follow.cap
+          hire_unit(u.warrior, cur_player, follow.x, follow.y + 8)
+        end, follow.action >= follow.cap)
       end
     end
   end
