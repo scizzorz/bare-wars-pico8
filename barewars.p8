@@ -1418,8 +1418,8 @@ end
 function hire_unit(unit_type, owner, x, y)
   owner = owner or cur_player
   local player = players[owner]
-  x = x or player.castle_x * 8
-  y = y or (player.castle_y * 8 + 16)
+  x = x or follow.x
+  y = y or (follow.y + 8)
 
   local new = _unit(owner, x, y, races[player.race], unit_type)
 
@@ -1455,13 +1455,8 @@ function make_base_menu()
       end
 
     elseif follow.is_house then
-      if follow.type == h.castle then
-        menu:add("hire", make_hire_menu)
-      elseif follow.type == h.cave then
-        menu:add("awaken", function()
-          follow.action -= follow.cap
-          hire_unit(u.warrior, cur_player, follow.x, follow.y + 8)
-        end, follow.action >= follow.cap)
+      if follow.type == h.cave then
+        menu:add("awaken", make_hire_menu, follow.action >= follow.cap)
       end
     end
   end
@@ -1501,9 +1496,17 @@ end
 function make_hire_menu()
   local player = players[cur_player]
   menu:clear()
-  menu:add(uc[u.worker] .. " worker", function() hire_unit(u.worker); player.money -= uc[u.worker] end, player.money >= uc[u.worker])
-  menu:add(uc[u.warrior] .. " warrior", function() hire_unit(u.warrior); player.money -= uc[u.warrior] end, player.money >= uc[u.warrior])
   menu.back = make_base_menu
+
+  menu:add("worker", function()
+    hire_unit(u.worker)
+    follow.action -= follow.cap
+  end)
+
+  menu:add("warrior", function()
+    hire_unit(u.warrior)
+    follow.action -= follow.cap
+  end)
 end
 
 function use_resource(x, y, owner, amt)
