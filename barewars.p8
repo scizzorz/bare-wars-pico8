@@ -1779,7 +1779,9 @@ function _update()
       house:update()
       if house.health <= 0 then
         del(houses, house)
-        houses[house.owner].houses -= 1
+        if houses[house.owner] and houses[house.owner].houses then
+          houses[house.owner].houses -= 1
+        end
 
         -- reset terrain to neutral
         local cell_x = flr(house.x / 8)
