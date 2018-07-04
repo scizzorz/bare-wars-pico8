@@ -721,7 +721,7 @@ end
 
 
 -- house class
--- houses are any building, but I'm not about to type 'building' a hundred times
+-- houses are any building, but i'm not about to type 'building' a hundred times
 _house = _sprite:extend()
 
 function _house:init(owner, x, y, type)
@@ -778,7 +778,7 @@ end
 function _house:act()
   if self.type == h.tower or self.type == h.castle then
     for unit in all(units) do
-      if unit.owner ~= self.owner and mdst(unit, self) <= 16 then
+      if unit.owner ~= self.owner and mdst(unit, self) <= 24 then
         sfx(a.bullet)
         unit.health -= 1
         self.action -= self.cap
