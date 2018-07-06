@@ -147,7 +147,7 @@ hs = {
   [h.wall] = {tile=t.wall, health=4, speed=0},
   [h.tower] = {tile=t.tower, health=6, cap=64},
   [h.cave] = {tile=t.cave, health=6, cap=256},
-  [h.farm] = {tile=t.farm, health=6, cap=64},
+  [h.farm] = {tile=t.farm, health=4, cap=64},
 }
 
 worker_range = 8
