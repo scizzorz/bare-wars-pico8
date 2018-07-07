@@ -11,6 +11,8 @@ color_map = {
   (0, 0, 0): 0,
 }
 
+default = 64
+
 new_map = []
 
 castle_color = (131, 118, 156)
@@ -25,7 +27,7 @@ with Image.open('map.png') as fp:
       new_map.append([])
 
     for x in range(w):
-      new_map[y % 32].append(color_map[pix[x, y]])
+      new_map[y % 32].append(color_map.get(pix[x, y], default))
 
       if pix[x, y] == castle_color:
         castle_locs.append(f'{{{x}, {y}}}')
