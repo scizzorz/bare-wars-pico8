@@ -19,7 +19,7 @@ with Image.open('map.png') as fp:
   for y in range(h):
     new_map.append([])
     for x in range(w):
-      new_map[-1].append(color_map[pix[x, y]])
+      new_map[y % 32].append(color_map[pix[x, y]])
 
 with open('barewars.p8') as fp:
   for line in fp:
