@@ -46,6 +46,7 @@ s = {
   menu=3,
   move=4,
   win=5,
+  map=6,
 }
 
 -- tiles
@@ -101,6 +102,16 @@ t = {
   ter_castle2 = 73,
   ter_castle3 = 74,
   ter_castle4 = 75,
+}
+
+-- map colors
+tc = {
+  [t.ter_plain] = c.darkgreen,
+  [t.ter_good] = c.darkgreen,
+  [t.ter_food] = c.red,
+  [t.ter_honey] = c.orange,
+  [t.ter_material] = c.brown,
+  [t.ter_build] = c.lightgrey,
 }
 
 -- sfx
@@ -1561,6 +1572,7 @@ function make_base_menu()
     end
   end
 
+  menu:add("map", function() change_state("map") end)
   menu:add("end turn", next_turn)
 end
 
@@ -1634,6 +1646,43 @@ function make_upgrade_menu()
     end
   end
 
+end
+
+function draw_map()
+  local left = cam.x + 8
+  local top = cam.y + 8
+
+  spr(t.menu_corner, left, top, 1, 1, false, false)
+  spr(t.menu_corner, left + 104, top, 1, 1, true, false)
+  spr(t.menu_corner, left, top + 104, 1, 1, false, true)
+  spr(t.menu_corner, left + 104, top + 104, 1, 1, true, true)
+
+  for i=1,12 do
+    spr(t.menu_hor, left + i * 8, top, 1, 1, false, false)
+    spr(t.menu_hor, left + i * 8, top + 104, 1, 1, false, true)
+    spr(t.menu_vert, left, top + i * 8, 1, 1, false, false)
+    spr(t.menu_vert, left + 104, top + i * 8, 1, 1, true, false)
+  end
+
+  rectfill(left + 8, top + 8, left + 103, top + 103, c.darkblue)
+
+  left += 24
+  top += 8
+  rectfill(left - 1, top - 1, left + 64, top + 64, c.darkgrey)
+
+  for x=0,63 do
+    for y=0,63 do
+      local cell_n = mget2(x, y)
+      if tc[cell_n] ~= nil then
+        pset(left + x, top + y, tc[cell_n])
+      end
+    end
+  end
+
+  for p in all(order) do
+    local player = players[p]
+    pset(left + player.castle_x, top + player.castle_y, player_colors[p])
+  end
 end
 
 function use_resource(x, y, owner, amt)
@@ -1798,11 +1847,16 @@ function _update()
       if menu.back ~= nil then
         menu.back()
       else
-        change_state(prev_state)
+        change_state("command")
       end
     end
 
     menu:update()
+
+  elseif state == s.map then
+    if btnp(b.x) or btnp(b.o) then
+      change_state("command")
+    end
 
   elseif state == s.move then
     if btnp(b.left) then
@@ -1995,6 +2049,12 @@ function _draw()
     if btn(b.o) then
       print("      \142", 43, 80, col)
     end
+
+  elseif state == s.map then
+    map(0, 0, 0, 0, 64, 32)
+    map(64, 0, 0, 256, 64, 32)
+    player_ui:draw()
+    draw_map()
 
   else
     map(0, 0, 0, 0, 64, 32)
