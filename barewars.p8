@@ -1701,7 +1701,10 @@ function draw_map()
   if (frame % 32) < 16 then
     local curs_x = flr(curs.x / 8)
     local curs_y = flr(curs.y / 8)
+    local cam_x = flr(cam.x / 8)
+    local cam_y = flr(cam.y / 8)
     pset(left + curs_x, top + curs_y, player_colors[cur_player])
+    rect(left + cam_x - 1, top + cam_y - 1, left + cam_x + 16, top + cam_y + 16, c_darkgrey)
   end
 end
 
