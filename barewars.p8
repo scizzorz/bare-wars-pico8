@@ -1168,7 +1168,7 @@ function _info:draw()
   end
 
   if res then
-    local offx = 0
+    local offx = -2
     if res >= 100 then
       offx = -10
     elseif res >= 10 then
