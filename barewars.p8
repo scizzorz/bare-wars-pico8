@@ -118,16 +118,6 @@ t = {
   ter_castle4 = 75,
 }
 
--- map colors
-tc = {
-  [t.ter_plain] = c_darkgreen,
-  [t.ter_good] = c_darkgreen,
-  [t.ter_food] = c_red,
-  [t.ter_honey] = c_orange,
-  [t.ter_material] = c_brown,
-  [t.ter_build] = c_lightgrey,
-}
-
 -- sfx
 a = {
   ping=0,
@@ -157,7 +147,6 @@ stats = {
 -- house types
 h = {
   castle=0,
-  wall=1,
   cave=2,
   tower=3,
   farm=4,
@@ -180,6 +169,34 @@ hs = {
   [h.tower] = {tile=t.tower, health=8, cap=16},
   [h.cave] = {tile=t.cave, health=6, cap=256},
   [h.farm] = {tile=t.farm, health=4, cap=64},
+}
+
+-- map tile colors
+tcol = {
+  [t.ter_plain] = c_darkgreen,
+  [t.ter_good] = c_darkgreen,
+  [t.ter_food] = c_pink,
+  [t.ter_honey] = c_orange,
+  [t.ter_material] = c_brown,
+  [t.ter_build] = c_lightgrey,
+  [t.ter_castle1] = c_indigo,
+  [t.ter_castle2] = c_indigo,
+  [t.ter_castle3] = c_indigo,
+  [t.ter_castle4] = c_indigo,
+}
+
+-- map unit colors
+ucol = {
+  [u.worker] = c_brown,
+  [u.warrior] = c_lightgrey,
+}
+
+-- map house colors
+hcol = {
+  [h.castle] = c_indigo,
+  [h.tower] = c_darkgrey,
+  [h.cave] = c_blue,
+  [h.farm] = c_green,
 }
 
 worker_range = 8
@@ -1688,23 +1705,45 @@ function draw_map()
   for x=0,63 do
     for y=0,63 do
       local cell_n = mget2(x, y)
-      if tc[cell_n] ~= nil then
-        pset(left + x, top + y, tc[cell_n])
+      if tcol[cell_n] ~= nil then
+        pset(left + x, top + y, tcol[cell_n])
       end
     end
   end
 
-  for p in all(order) do
-    local player = players[p]
-    pset(left + player.castle_x, top + player.castle_y, player_colors[p])
-  end
-  if (frame % 32) < 16 then
+  local blink = (frame % 40) < 20
+  if blink then
     local curs_x = flr(curs.x / 8)
     local curs_y = flr(curs.y / 8)
-    local cam_x = flr(cam.x / 8)
-    local cam_y = flr(cam.y / 8)
-    pset(left + curs_x, top + curs_y, player_colors[cur_player])
-    rect(left + cam_x - 1, top + cam_y - 1, left + cam_x + 16, top + cam_y + 16, c_darkgrey)
+    local curs_col = nil
+    if follow ~= nil then
+      curs_col = player_colors[follow.owner]
+    end
+    pset(left + curs_x, top + curs_y, curs_col)
+  end
+
+  local cam_x = flr(cam.x / 8)
+  local cam_y = flr(cam.y / 8)
+  rect(left + cam_x - 1, top + cam_y - 1, left + cam_x + 16, top + cam_y + 16, c_darkgrey)
+
+  for unit in all(units) do
+    local ux = flr(unit.x / 8)
+    local uy = flr(unit.y / 8)
+    local col = ucol[unit.type]
+    if blink then
+      col = player_colors[unit.owner]
+    end
+    pset(left + ux, top + uy, col)
+  end
+
+  for house in all(houses) do
+    local ux = flr(house.x / 8)
+    local uy = flr(house.y / 8)
+    local col = hcol[house.type]
+    if blink then
+      col = player_colors[house.owner]
+    end
+    pset(left + ux, top + uy, col)
   end
 end
 
