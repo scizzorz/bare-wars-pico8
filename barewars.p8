@@ -136,21 +136,23 @@ h = {
   cave=2,
   tower=3,
   farm=4,
+  castle_tower=5,
+  castle_repair=6,
 }
 
 -- house costs
 hc = {
-  [h.wall]=8,
+  [h.tower]=8,
   [h.farm]=10,
   [h.cave]=14,
-  [h.tower]=14,
+  [h.castle_tower]=6,
+  [h.castle_repair]=8,
 }
 
 -- house stats
 hs = {
-  [h.castle] = {tile=t.blank, health=12, cap=16},
-  [h.wall] = {tile=t.wall, health=4, speed=0},
-  [h.tower] = {tile=t.tower, health=6, cap=64},
+  [h.castle] = {tile=t.blank, health=12, cap=64, speed=0},
+  [h.tower] = {tile=t.tower, health=8, cap=64},
   [h.cave] = {tile=t.cave, health=6, cap=256},
   [h.farm] = {tile=t.farm, health=4, cap=64},
 }
@@ -1550,6 +1552,9 @@ function make_base_menu()
     elseif follow.is_house then
       if follow.type == h.cave then
         menu:add("awaken", make_hire_menu, follow.action >= follow.cap)
+
+      elseif follow.type == h.castle then
+        menu:add("upgrade", make_upgrade_menu, follow.cap > 8)
       end
     end
   end
@@ -1596,6 +1601,34 @@ function make_hire_menu()
     hire_unit(u.warrior)
     follow.action -= follow.cap
   end)
+end
+
+function make_upgrade_menu()
+  local player = players[cur_player]
+  menu:clear()
+  menu.back = make_base_menu
+
+  menu:add(hc[h.castle_repair] .. " heal", function()
+    follow.health += 1
+    player.materials -= hc[h.castle_repair]
+    change_state(prev_state)
+  end, player.materials >= hc[h.castle_repair] and follow.health < follow.max_health)
+
+  if follow.speed == 0 then
+    menu:add(hc[h.castle_tower] .. " tower", function()
+      follow.speed += 1
+      player.materials -= hc[h.castle_tower]
+      change_state(prev_state)
+    end, player.materials >= hc[h.castle_tower])
+
+  else
+    local cost = hc[h.castle_tower] + (hs[h.castle].cap - follow.cap) / 2
+    menu:add(cost .. " speed", function()
+      follow.cap -= 8
+      player.materials -= cost
+      change_state(prev_state)
+    end, player.materials >= cost)
+  end
 end
 
 function use_resource(x, y, owner, amt)
