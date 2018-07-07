@@ -1046,6 +1046,7 @@ function draw_info()
   palt(c_black, false)
   palt(c_red, true)
 
+  -- decide which player's info to show
   local player_num = cur_player
   if follow ~= nil then
     player_num = follow.owner
@@ -1053,6 +1054,7 @@ function draw_info()
 
   local player = players[player_num]
 
+  -- decide which UI slot that is
   local ui_slot = 1
   for i=1, #order do
     if order[i] == player_num then
@@ -1061,10 +1063,12 @@ function draw_info()
     end
   end
 
+  -- in play state with no player, show them all on the left side
   if player == nil then
     ui_slot = #order
   end
 
+  -- draw side bar units
   for i=1, #units do
     local top = 6 + cam.y + 3 * i
     local left = 2 + cam.x
@@ -1082,6 +1086,7 @@ function draw_info()
 
   end
 
+  -- draw side bar houses
   for i=1, #houses do
     local top = 6 + cam.y + 3 * i
     local left = 5 + cam.x
@@ -1097,6 +1102,7 @@ function draw_info()
     end
   end
 
+  -- draw background + gems
   local left = cam.x
   local top = cam.y
   local ui_start = ui_slot
@@ -1167,7 +1173,7 @@ function draw_info()
     spr(t_ui_material, ui_right + 2, top + 6)
   end
 
-  if res then
+  if res and res > 0 then
     local offx = -2
     if res >= 100 then
       offx = -10
