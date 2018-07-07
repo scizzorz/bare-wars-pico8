@@ -1232,27 +1232,24 @@ function init_players()
   players = {}
   order = {}
   for p=1, num_players do
+    -- decide player race
     local race = flr(rnd(#races) + 1)
-    local x = flr(rnd(56)) + 4
-    local y = flr(rnd(56)) + 4
+
+    -- decide castle location
+    local castle_loc = castle_locs[flr(rnd(#castle_locs) + 1)]
+    del(castle_locs, castle_loc)
+    local x = castle_loc[1]
+    local y = castle_loc[2]
+
+    -- make a worker unit and a castle house
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
     local castle = _house(p, x * 8 + 4, y * 8 + 4, h.castle)
 
-    -- decide which terrain to draw the castle on
-    local ter = 0
-    if x > 31 and y > 31 then
-      ter = 3
-    elseif x > 31 then
-      ter = 2
-    elseif y > 31 then
-      ter = 1
-    end
-
     -- draw castle
-    mset2(x, y, t.ter_castle1 + ter * 16)
-    mset2(x + 1, y, t.ter_castle2 + ter * 16)
-    mset2(x, y + 1, t.ter_castle3 + ter * 16)
-    mset2(x + 1, y + 1, t.ter_castle4 + ter * 16)
+    mset2(x, y, t.ter_castle1)
+    mset2(x + 1, y, t.ter_castle2)
+    mset2(x, y + 1, t.ter_castle3)
+    mset2(x + 1, y + 1, t.ter_castle4)
 
     add(units, worker)
     add(houses, castle)
