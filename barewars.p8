@@ -1181,7 +1181,7 @@ function _info:draw()
   palt()
 
   -- draw castle indicators
-  for p=1, #order do
+  for p in all(order) do
     local sx = cam.x + 64
     local sy = cam.y + 64
     local player = players[p]
