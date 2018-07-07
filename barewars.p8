@@ -1595,7 +1595,15 @@ function make_base_menu()
 
     elseif follow.is_house then
       if follow.type == h_cave then
-        menu:add("awaken", make_hire_menu, follow.action >= follow.cap)
+        local can_awaken = follow.action >= follow.cap
+        -- this doesn't prevent you from awakening while someone has the spawn zone targeted
+        for unit in all(units) do
+          if unit.x == follow.x and unit.y == follow.y + 8 then
+            can_awaken = false
+          end
+        end
+
+        menu:add("awaken", make_hire_menu, can_awaken)
 
       elseif follow.type == h_castle then
         menu:add("upgrade", make_upgrade_menu)
