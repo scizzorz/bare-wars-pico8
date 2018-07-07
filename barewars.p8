@@ -93,9 +93,10 @@ t = {
   ter_plain = 64,
   ter_good = 65,
   ter_food = 66,
-  ter_money = 67,
+  ter_honey = 67,
   ter_material = 68,
   ter_wall = 69,
+  ter_build = 70,
   ter_castle1 = 72,
   ter_castle2 = 73,
   ter_castle3 = 74,
@@ -1140,18 +1141,21 @@ function _info:draw()
   local res = get_resources(curs_x, curs_y)
 
   -- draw map resource info
-  if fget(cell_n, f.food) then
-    spr(t.ui_food, ui_right + 4, top + 6)
+  if fget(cell_n, f.food) and fget(cell_n, f.material) then
+    spr(t.ui_material, ui_right + 8, top + 6)
+    spr(t.ui_food, ui_right + 2, top + 6)
+  elseif fget(cell_n, f.food) then
+    spr(t.ui_food, ui_right + 2, top + 6)
   elseif fget(cell_n, f.material) then
-    spr(t.ui_material, ui_right + 4, top + 6)
+    spr(t.ui_material, ui_right + 2, top + 6)
   end
 
   if res then
     local offx = 0
     if res >= 100 then
-      offx = -8
+      offx = -10
     elseif res >= 10 then
-      offx = -4
+      offx = -6
     end
     print(res, ui_right + offx, top + 7, c.white)
   end
@@ -1610,7 +1614,9 @@ function use_resource(x, y, owner, amt)
 
   if fget(cell, f.food) then
     player.food += amt
-  elseif fget(cell, f.material) then
+  end
+
+  if fget(cell, f.material) then
     player.materials += amt
   end
 
