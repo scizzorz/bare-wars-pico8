@@ -8,7 +8,11 @@ __lua__
 castle_locs = {{25, 5}, {10, 10}, {52, 10}, {37, 13}, {46, 22}, {2, 23}, {57, 25}, {28, 27}, {20, 36}, {49, 37}, {5, 42}, {33, 42}, {59, 51}, {25, 54}, {40, 57}, {10, 58}}
 -- END AUTOGEN
 
-player_colors = {
+-- buttons
+b = {left=0, right=1, up=2, down=3, o=4, x=5}
+
+-- colors
+c = {
   black=0, darkblue=1, darkpurple=2, darkgreen=3,
   brown=4, darkgrey=5, lightgrey=6, white=7,
   red=8, orange=9, yellow=10, green=11,
