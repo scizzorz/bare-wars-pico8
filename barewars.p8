@@ -1771,15 +1771,11 @@ function draw_map()
   if (frame % 40) < 20 then
     local curs_x = flr(curs.x / 4) / 2
     local curs_y = flr(curs.y / 4) / 2
-    local curs_col = nil
-    if follow ~= nil then
-      curs_col = player_colors[follow.owner]
-    end
-    draw_tile(curs_x, curs_y, curs_col)
+    draw_tile(curs_x, curs_y, c_black)
   end
 
-  local cam_x = left + flr(cam.x / 8) * 2
-  local cam_y = top + flr(cam.y / 8) * 2
+  local cam_x = left + flr(cam.x / 4)
+  local cam_y = top + flr(cam.y / 4)
   rect(cam_x - 1, cam_y - 1, cam_x + 32, cam_y + 32, c_darkgrey)
 end
 
