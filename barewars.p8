@@ -8,6 +8,24 @@ __lua__
 castle_locs = {{25, 5}, {10, 10}, {52, 10}, {37, 13}, {46, 22}, {2, 23}, {57, 25}, {28, 27}, {20, 36}, {49, 37}, {5, 42}, {33, 42}, {59, 51}, {25, 54}, {40, 57}, {10, 58}}
 -- end autogen
 
+function abtn(i)
+  for k=0,7 do
+    if btn(i, k) then
+      return true
+    end
+  end
+  return false
+end
+
+function abtnp(i)
+  for k=0,7 do
+    if btnp(i, k) then
+      return true
+    end
+  end
+  return false
+end
+
 -- buttons
 b_left = 0
 b_right = 1
@@ -1826,7 +1844,7 @@ end
 frame = 0
 function _update()
   pbtns = btns
-  btns = {[0]=btn(0), [1]=btn(1), [2]=btn(2), [3]=btn(3), [4]=btn(4), [5]=btn(5)}
+  btns = {[0]=abtn(0), [1]=abtn(1), [2]=abtn(2), [3]=abtn(3), [4]=abtn(4), [5]=abtn(5)}
   frame += 1
 
   if state == s.splash or state == s.win then
@@ -1839,7 +1857,7 @@ function _update()
       move_amt = 12
     end
 
-    if btnp(b_left) then
+    if abtnp(b_left) then
       if btns[b_o] then
         jump_to_prev_unit()
       else
@@ -1847,7 +1865,7 @@ function _update()
       end
     end
 
-    if btnp(b_right) then
+    if abtnp(b_right) then
       if btns[b_o] then
         jump_to_next_unit()
       else
@@ -1855,7 +1873,7 @@ function _update()
       end
     end
 
-    if btnp(b_up) then
+    if abtnp(b_up) then
       if btns[b_o] then
         jump_to_prev_unit(houses)
       else
@@ -1863,7 +1881,7 @@ function _update()
       end
     end
 
-    if btnp(b_down) then
+    if abtnp(b_down) then
       if btns[b_o] then
         jump_to_next_unit(houses)
       else
@@ -1910,7 +1928,7 @@ function _update()
       end
     end
 
-    if btnp(b_x) then
+    if abtnp(b_x) then
       if map_open then
         map_open = false
       elseif state == s.command then
@@ -1925,19 +1943,19 @@ function _update()
     end
 
   elseif state == s.menu then
-    if btnp(b_down) then
+    if abtnp(b_down) then
       menu:down()
     end
 
-    if btnp(b_up) then
+    if abtnp(b_up) then
       menu:up()
     end
 
-    if btnp(b_x) then
+    if abtnp(b_x) then
       menu:call()
     end
 
-    if btnp(b_o) then
+    if abtnp(b_o) then
       if menu.back ~= nil then
         menu.back()
       else
@@ -1948,19 +1966,19 @@ function _update()
     menu:update()
 
   elseif state == s.move then
-    if btnp(b_left) then
+    if abtnp(b_left) then
       curs:dmove(-8, 0)
     end
 
-    if btnp(b_right) then
+    if abtnp(b_right) then
       curs:dmove(8, 0)
     end
 
-    if btnp(b_up) then
+    if abtnp(b_up) then
       curs:dmove(0, -8)
     end
 
-    if btnp(b_down) then
+    if abtnp(b_down) then
       curs:dmove(0, 8)
     end
 
@@ -1970,7 +1988,7 @@ function _update()
       follow:set_dest(follow.x, follow.y)
     else
       curs.palette = pal_trans_red
-      if btnp(b_left) or btnp(b_right) or btnp(b_up) or btnp(b_down) then
+      if abtnp(b_left) or abtnp(b_right) or abtnp(b_up) or abtnp(b_down) then
         follow:set_dest(curs.x, curs.y)
       end
     end
@@ -1980,7 +1998,7 @@ function _update()
       follow:set_dest(follow.x, follow.y)
     end
 
-    if btnp(b_x) then
+    if abtnp(b_x) then
       if curs.palette == pal_trans_red then
         curs.palette = pal_trans_red
         follow = nil
@@ -1991,7 +2009,7 @@ function _update()
       end
     end
 
-    if btnp(b_o) then
+    if abtnp(b_o) then
       follow:set_dest(follow.x, follow.y)
       change_state("command")
     end
@@ -2088,17 +2106,17 @@ function _draw()
 
       print("press \142+\151", 43, 80, c_lightgrey)
 
-      if btnp(b_left) then
+      if abtnp(b_left) then
         num_players = max(num_players - 1, min_players)
         sfx(sfx_ping)
       end
 
-      if btnp(b_right) then
+      if abtnp(b_right) then
         num_players = min(num_players + 1, max_players)
         sfx(sfx_ping)
       end
 
-      if btn(b_o) and btn(b_x) then
+      if abtn(b_o) and abtn(b_x) then
         init_players()
         change_state("command")
       end
@@ -2121,7 +2139,7 @@ function _draw()
 
       print("reset \142+\151", 43, 80, c_lightgrey)
 
-      if btn(b_o) and btn(b_x) then
+      if abtn(b_o) and abtn(b_x) then
         run()
       end
     end
@@ -2131,11 +2149,11 @@ function _draw()
       col = player_colors[order[1]]
     end
 
-    if btn(b_x) then
+    if abtn(b_x) then
       print("         \151", 43, 80, col)
     end
 
-    if btn(b_o) then
+    if abtn(b_o) then
       print("      \142", 43, 80, col)
     end
 
