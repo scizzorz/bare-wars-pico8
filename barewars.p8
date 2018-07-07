@@ -1901,7 +1901,9 @@ function _update()
     end
 
     if not pbtns[b_o] and btns[b_o] then
-      if cur_player and follow ~= nil then
+      if map_open then
+        map_open = false
+      elseif cur_player and follow ~= nil then
         jump_to_next_owned()
       else
         jump_to_closest_unit()
