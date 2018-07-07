@@ -45,13 +45,10 @@ player_colors = {
 }
 
 -- flags
-f = {
-  solid=0,
-  food=1,
-  material=3,
-  castle=4,
-  empty=5,
-}
+f_solid=0
+f_food=1
+f_material=3
+f_empty=5
 
 -- states
 s = {
@@ -64,139 +61,131 @@ s = {
 }
 
 -- tiles
-t = {
-  curs1=1,
-  curs2=2,
-  curs3=3,
-  curs4=4,
+t_curs1=1
+t_curs2=2
+t_curs3=3
+t_curs4=4
 
-  worker_walk1=5,
-  worker_walk2=6,
-  worker_walk3=7,
+t_worker_walk1=5
+t_worker_walk2=6
+t_worker_walk3=7
 
-  warrior_walk1=24,
-  warrior_walk2=25,
-  warrior_walk3=26,
+t_warrior_walk1=24
+t_warrior_walk2=25
+t_warrior_walk3=26
 
-  wall=8,
-  tower=9,
-  cave=10,
-  blank=11,
-  farm=40,
+t_wall=8
+t_tower=9
+t_cave=10
+t_blank=11
+t_farm=40
 
-  meter_end=17,
-  meter_mid=18,
+t_meter_end=17
+t_meter_mid=18
 
-  menu_corner=33,
-  menu_hor=34,
-  menu_vert=35,
-  menu_arr=36,
+t_menu_corner=33
+t_menu_hor=34
+t_menu_vert=35
+t_menu_arr=36
 
-  ui_left_gem=19,
-  ui_left_nogem=20,
-  ui_mid_gem=21,
-  ui_mid_nogem=22,
-  ui_corner=23,
-  ui_food=49,
-  ui_material=51,
-  ui_heart=52,
-  ui_unit=53,
-  ui_sword=54,
-  ui_pick=55,
-  ui_house=56,
+t_ui_left_gem=19
+t_ui_left_nogem=20
+t_ui_mid_gem=21
+t_ui_mid_nogem=22
+t_ui_corner=23
+t_ui_food=49
+t_ui_material=51
+t_ui_heart=52
+t_ui_unit=53
+t_ui_sword=54
+t_ui_pick=55
+t_ui_house=56
 
-  ter_plain = 64,
-  ter_good = 65,
-  ter_food = 66,
-  ter_honey = 67,
-  ter_material = 68,
-  ter_wall = 69,
-  ter_build = 70,
-  ter_castle1 = 72,
-  ter_castle2 = 73,
-  ter_castle3 = 74,
-  ter_castle4 = 75,
-}
+t_ter_plain = 64
+t_ter_good = 65
+t_ter_food = 66
+t_ter_honey = 67
+t_ter_material = 68
+t_ter_wall = 69
+t_ter_build = 70
+t_ter_castle1 = 72
+t_ter_castle2 = 73
+t_ter_castle3 = 74
+t_ter_castle4 = 75
 
 -- sfx
-a = {
-  ping=0,
-  ok=1,
-  no=2,
-  bullet=3,
-}
+sfx_ping=0
+sfx_ok=1
+sfx_no=2
+sfx_bullet=3
 
 -- unit types
-u = {
-  worker=0,
-  warrior=1,
-}
+u_worker=0
+u_warrior=1
 
 -- unit costs
 uc = {
-  [u.worker]=10,
-  [u.warrior]=14,
+  [u_worker]=10,
+  [u_warrior]=14,
 }
 
 -- unit stats
 stats = {
-  [u.worker] = {health=3, fight=1, gather=2},
-  [u.warrior] = {health=5, fight=2, gather=1},
+  [u_worker] = {health=3, fight=1, gather=2},
+  [u_warrior] = {health=5, fight=2, gather=1},
 }
 
 -- house types
-h = {
-  castle=0,
-  cave=2,
-  tower=3,
-  farm=4,
-  castle_tower=5,
-  castle_repair=6,
-}
+h_castle=0
+h_cave=2
+h_tower=3
+h_farm=4
+h_castle_tower=5
+h_castle_repair=6
 
 -- house costs
 hc = {
-  [h.tower]=8,
-  [h.farm]=10,
-  [h.cave]=14,
-  [h.castle_tower]=6,
-  [h.castle_repair]=8,
+  [h_tower]=8,
+  [h_farm]=10,
+  [h_cave]=14,
+  [h_castle_tower]=6,
+  [h_castle_repair]=8,
 }
 
 -- house stats
 hs = {
-  [h.castle] = {tile=t.blank, health=12, cap=64, speed=0},
-  [h.tower] = {tile=t.tower, health=8, cap=16},
-  [h.cave] = {tile=t.cave, health=6, cap=256},
-  [h.farm] = {tile=t.farm, health=4, cap=64},
+  [h_castle] = {tile=t_blank, health=12, cap=64, speed=0},
+  [h_tower] = {tile=t_tower, health=8, cap=16},
+  [h_cave] = {tile=t_cave, health=6, cap=256},
+  [h_farm] = {tile=t_farm, health=4, cap=64},
 }
 
 -- map tile colors
 tcol = {
-  [t.ter_plain] = c_darkgreen,
-  [t.ter_good] = c_darkgreen,
-  [t.ter_food] = c_pink,
-  [t.ter_honey] = c_orange,
-  [t.ter_material] = c_brown,
-  [t.ter_build] = c_lightgrey,
-  [t.ter_castle1] = c_indigo,
-  [t.ter_castle2] = c_indigo,
-  [t.ter_castle3] = c_indigo,
-  [t.ter_castle4] = c_indigo,
+  [t_ter_plain] = c_darkgreen,
+  [t_ter_good] = c_darkgreen,
+  [t_ter_food] = c_pink,
+  [t_ter_honey] = c_orange,
+  [t_ter_material] = c_brown,
+  [t_ter_build] = c_lightgrey,
+  [t_ter_castle1] = c_indigo,
+  [t_ter_castle2] = c_indigo,
+  [t_ter_castle3] = c_indigo,
+  [t_ter_castle4] = c_indigo,
 }
 
 -- map unit colors
 ucol = {
-  [u.worker] = c_brown,
-  [u.warrior] = c_lightgrey,
+  [u_worker] = c_brown,
+  [u_warrior] = c_lightgrey,
 }
 
 -- map house colors
 hcol = {
-  [h.castle] = c_indigo,
-  [h.tower] = c_darkgrey,
-  [h.cave] = c_darkblue,
-  [h.farm] = c_green,
+  [h_castle] = c_indigo,
+  [h_tower] = c_darkgrey,
+  [h_cave] = c_darkblue,
+  [h_farm] = c_green,
 }
 
 worker_range = 8
@@ -328,7 +317,7 @@ end
 function can_path(x, y)
   if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget2(x, y)
-    local is_solid = fget(n, f.solid)
+    local is_solid = fget(n, f_solid)
     if not is_solid then
       return true
     end
@@ -340,7 +329,7 @@ end
 function can_build(x, y)
   if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget2(x, y)
-    local is_empty = fget(n, f.empty)
+    local is_empty = fget(n, f_empty)
     if is_empty then
       return true
     end
@@ -564,15 +553,15 @@ end
 
 -- animations
 an_stand = {
-  [u.worker] = t.worker_walk1,
-  [u.warrior] = t.warrior_walk1,
+  [u_worker] = t_worker_walk1,
+  [u_warrior] = t_warrior_walk1,
 }
 an_walk = {
-  [u.worker] = _anim({t.worker_walk1, t.worker_walk2, t.worker_walk1, t.worker_walk3}, 10),
-  [u.warrior] = _anim({t.warrior_walk1, t.warrior_walk2, t.warrior_walk1, t.warrior_walk3}, 10),
+  [u_worker] = _anim({t_worker_walk1, t_worker_walk2, t_worker_walk1, t_worker_walk3}, 10),
+  [u_warrior] = _anim({t_warrior_walk1, t_warrior_walk2, t_warrior_walk1, t_warrior_walk3}, 10),
 }
 
-an_curs = _anim({t.curs1, t.curs2, t.curs3, t.curs4}, 10)
+an_curs = _anim({t_curs1, t_curs2, t_curs3, t_curs4}, 10)
 
 -- palettes
 function pal_trans_red()
@@ -632,7 +621,7 @@ function _unit:init(owner, x, y, palette, type)
   self.__super.init(self, 0, x, y, palette)
   self.is_unit = true
   self.owner = owner
-  self.type = type or u.worker
+  self.type = type or u_worker
   self.tile = an_stand[self.type]
 
   local stats = stats[self.type]
@@ -797,7 +786,7 @@ function _unit:fight_enemy()
 
   for house in all(houses) do
     local range = 8
-    if house.type == h.castle then
+    if house.type == h_castle then
       range = 16
     end
     if house.owner ~= self.owner and mdst(house, self) <= range then
@@ -831,13 +820,13 @@ function _house:init(owner, x, y, type)
 
   local cell_n = mget2(self.mx, self.my)
   if cell_n <= 75 then
-    mset2(self.mx, self.my, t.ter_wall)
+    mset2(self.mx, self.my, t_ter_wall)
   elseif cell_n <= 91 then
-    mset2(self.mx, self.my, t.ter_wall + 16)
+    mset2(self.mx, self.my, t_ter_wall + 16)
   elseif cell_n <= 107 then
-    mset2(self.mx, self.my, t.ter_wall + 32)
+    mset2(self.mx, self.my, t_ter_wall + 32)
   elseif cell_n <= 123 then
-    mset2(self.mx, self.my, t.ter_wall + 48)
+    mset2(self.mx, self.my, t_ter_wall + 48)
   end
 
   for unit in all(units) do
@@ -858,7 +847,7 @@ function _house:update()
 end
 
 function _house:draw()
-  if self ~= follow and self.type ~= h.castle then
+  if self ~= follow and self.type ~= h_castle then
     local col = c_pink
     for i=1,self.max_health do
       if i > self.health then
@@ -879,17 +868,17 @@ function _house:draw()
 end
 
 function _house:act()
-  if self.type == h.tower or self.type == h.castle then
+  if self.type == h_tower or self.type == h_castle then
     for unit in all(units) do
       if unit.owner ~= self.owner and mdst(unit, self) <= 24 then
-        sfx(a.bullet)
+        sfx(sfx_bullet)
         unit.health -= 1
         self.action -= self.cap
         return
       end
     end
-  elseif self.type == h.cave then
-  elseif self.type == h.farm then
+  elseif self.type == h_cave then
+  elseif self.type == h_farm then
     players[self.owner].food += 1
     self.action -= self.cap
   end
@@ -973,22 +962,22 @@ function _menu:draw()
   end
 
   -- corners + fill
-  spr(t.menu_corner, left, top, 1, 1, false, false)
-  spr(t.menu_corner, right, top, 1, 1, true, false)
-  spr(t.menu_corner, left, bottom, 1, 1, false, true)
-  spr(t.menu_corner, right, bottom, 1, 1, true, true)
+  spr(t_menu_corner, left, top, 1, 1, false, false)
+  spr(t_menu_corner, right, top, 1, 1, true, false)
+  spr(t_menu_corner, left, bottom, 1, 1, false, true)
+  spr(t_menu_corner, right, bottom, 1, 1, true, true)
   rectfill(left + 8, top + 8, right - 1, bottom - 1, c_darkblue)
 
   -- horizontal walls
   for x=1, width do
-    spr(t.menu_hor, left + 8 * x, top, 1, 1, false, false)
-    spr(t.menu_hor, left + 8 * x, bottom, 1, 1, false, true)
+    spr(t_menu_hor, left + 8 * x, top, 1, 1, false, false)
+    spr(t_menu_hor, left + 8 * x, bottom, 1, 1, false, true)
   end
 
   -- vertical walls
   for y=1, height - 1 do
-    spr(t.menu_vert, left, top + 8 * y, 1, 1, false, false)
-    spr(t.menu_vert, right, top + 8 * y, 1, 1, true, false)
+    spr(t_menu_vert, left, top + 8 * y, 1, 1, false, false)
+    spr(t_menu_vert, right, top + 8 * y, 1, 1, true, false)
   end
 
   --text
@@ -996,7 +985,7 @@ function _menu:draw()
     local col = c_lightgrey
     if y == self.idx then
       col = c_white
-      spr(t.menu_arr, left + 2, top - 4 + 8 * y)
+      spr(t_menu_arr, left + 2, top - 4 + 8 * y)
     end
     if not self.enables[y] then
       col = c_darkgrey
@@ -1040,13 +1029,13 @@ function _meter:draw()
   line(left + 2, top + 4, left + 2 + fill, top + 4, self.base)
   line(left + 2, top + 5, left + 2 + fill, top + 5, self.lo)
 
-  spr(t.meter_end, left, top, 1, 1, false, false)
+  spr(t_meter_end, left, top, 1, 1, false, false)
 
   for n=1, ceil((self.width - 16)/8) do
-    spr(t.meter_mid, left + 8 * n, top)
+    spr(t_meter_mid, left + 8 * n, top)
   end
 
-  spr(t.meter_end, left + self.width - 8, top, 1, 1, true, false)
+  spr(t_meter_end, left + self.width - 8, top, 1, 1, true, false)
 
   palt()
 end
@@ -1109,7 +1098,7 @@ function _info:draw()
 
     pset(left, top, player_colors[houses[i].owner])
 
-    if (house.action >= house.cap) and (house.type == h.cave) then
+    if (house.action >= house.cap) and (house.type == h_cave) then
       pset(left + 1, top, c_yellow)
     end
   end
@@ -1131,28 +1120,28 @@ function _info:draw()
     pal(c_pink, player_colors[order[p]])
 
     if p < ui_slot then
-      spr(t.ui_left_gem, left + 8 * (p - 1), top)
+      spr(t_ui_left_gem, left + 8 * (p - 1), top)
     elseif p == ui_slot then
-      spr(t.ui_mid_gem, left + 8 * (p - 1), top)
+      spr(t_ui_mid_gem, left + 8 * (p - 1), top)
     else
-      local i = t.ui_left_gem
+      local i = t_ui_left_gem
       if p == #order then
-        i = t.ui_mid_gem
+        i = t_ui_mid_gem
       end
       spr(i, left + 120 - (#order) * 8 + 8 * p, top)
     end
   end
 
-  spr(t.ui_corner, ui_left, top + 7)
+  spr(t_ui_corner, ui_left, top + 7)
   for i=ui_start + 1, ui_end - 2 do
-    spr(t.ui_mid_nogem, left + i * 8, top + 7)
+    spr(t_ui_mid_nogem, left + i * 8, top + 7)
   end
-  spr(t.ui_mid_nogem, left + ui_end * 8 - 12, top + 7)
+  spr(t_ui_mid_nogem, left + ui_end * 8 - 12, top + 7)
 
   rectfill(ui_left, top, left + ui_end * 8 - 1, top + 6, c_black)
 
-  spr(t.ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
-  spr(t.ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
+  spr(t_ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
+  spr(t_ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
 
   -- reset palette swaps from the gems
   pal()
@@ -1160,17 +1149,17 @@ function _info:draw()
 
   -- draw resources
   if player ~= nil then
-    spr(t.ui_food, ui_left + 3, top - 1)
+    spr(t_ui_food, ui_left + 3, top - 1)
     print(player.food, ui_left + 10, top, c_white)
 
-    spr(t.ui_material, ui_left + 19, top - 1)
+    spr(t_ui_material, ui_left + 19, top - 1)
     print(player.materials, ui_left + 26, top, c_white)
 
-    spr(t.ui_house, ui_left + 53, top - 1)
+    spr(t_ui_house, ui_left + 53, top - 1)
     print(player.houses, ui_left + 62, top, c_white)
 
     races[player.race]()
-    spr(t.ui_unit, ui_left + 36, top - 1)
+    spr(t_ui_unit, ui_left + 36, top - 1)
     print(player.units, ui_left + 44, top, c_white)
   end
 
@@ -1186,13 +1175,13 @@ function _info:draw()
   local res = get_resources(curs_x, curs_y)
 
   -- draw map resource info
-  if fget(cell_n, f.food) and fget(cell_n, f.material) then
-    spr(t.ui_material, ui_right + 8, top + 6)
-    spr(t.ui_food, ui_right + 2, top + 6)
-  elseif fget(cell_n, f.food) then
-    spr(t.ui_food, ui_right + 2, top + 6)
-  elseif fget(cell_n, f.material) then
-    spr(t.ui_material, ui_right + 2, top + 6)
+  if fget(cell_n, f_food) and fget(cell_n, f_material) then
+    spr(t_ui_material, ui_right + 8, top + 6)
+    spr(t_ui_food, ui_right + 2, top + 6)
+  elseif fget(cell_n, f_food) then
+    spr(t_ui_food, ui_right + 2, top + 6)
+  elseif fget(cell_n, f_material) then
+    spr(t_ui_material, ui_right + 2, top + 6)
   end
 
   if res then
@@ -1209,11 +1198,11 @@ function _info:draw()
   if follow ~= nil then
     if follow.is_unit then
       for i=1, follow.fight do
-        spr(t.ui_sword, ui_left + (i + follow.max_health) * 6 + 2, top + 6)
+        spr(t_ui_sword, ui_left + (i + follow.max_health) * 6 + 2, top + 6)
       end
 
       for i=1, follow.gather do
-        spr(t.ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 + 6, top + 6)
+        spr(t_ui_pick, ui_left + (i + follow.max_health + follow.fight) * 6 + 6, top + 6)
       end
     end
 
@@ -1228,7 +1217,7 @@ function _info:draw()
         pal(c_red, c_darkblue)
         pal(c_pink, c_indigo)
       end
-      spr(t.ui_heart, ui_left + i * 6 - 2, top + 6)
+      spr(t_ui_heart, ui_left + i * 6 - 2, top + 6)
     end
   end
 
@@ -1295,13 +1284,13 @@ function init_players()
 
     -- make a worker unit and a castle house
     local worker = _unit(p, x * 8, y * 8 + 16, races[race])
-    local castle = _house(p, x * 8 + 4, y * 8 + 4, h.castle)
+    local castle = _house(p, x * 8 + 4, y * 8 + 4, h_castle)
 
     -- draw castle
-    mset2(x, y, t.ter_castle1)
-    mset2(x + 1, y, t.ter_castle2)
-    mset2(x, y + 1, t.ter_castle3)
-    mset2(x + 1, y + 1, t.ter_castle4)
+    mset2(x, y, t_ter_castle1)
+    mset2(x + 1, y, t_ter_castle2)
+    mset2(x, y + 1, t_ter_castle3)
+    mset2(x + 1, y + 1, t_ter_castle4)
 
     add(units, worker)
     add(houses, castle)
@@ -1345,7 +1334,7 @@ function jump_to_closest_unit()
   -- move cursor to unit
   follow = closest_unit
   curs:move(closest_unit.x, closest_unit.y)
-  sfx(a.ping)
+  sfx(sfx_ping)
 end
 
 -- move the cursor to the next unit (undefined behavior if no unit is under the cursor)
@@ -1370,7 +1359,7 @@ function jump_to_next_unit(list)
   -- move cursor to unit
   follow = unit
   curs:move(unit.x, unit.y)
-  sfx(a.ping)
+  sfx(sfx_ping)
 end
 
 -- move the cursor to the previous unit (undefined behavior if no unit is under the cursor)
@@ -1396,7 +1385,7 @@ function jump_to_prev_unit(list)
   -- move cursor to unit
   follow = unit
   curs:move(unit.x, unit.y)
-  sfx(a.ping)
+  sfx(sfx_ping)
 end
 
 -- move the cursor to the next unit owned by the cur_player
@@ -1409,7 +1398,7 @@ function jump_to_next_owned()
       if next then
         follow = unit
         curs:move(unit.x, unit.y)
-        sfx(a.ping)
+        sfx(sfx_ping)
         return
       end
 
@@ -1431,7 +1420,7 @@ function jump_to_first_owned()
     if unit.owner == cur_player then
       follow = unit
       curs:move(unit.x, unit.y)
-      sfx(a.ping)
+      sfx(sfx_ping)
       break
     end
   end
@@ -1470,7 +1459,7 @@ function update_owned_counts()
 
     for house in all(houses) do
       if house.owner == p then
-        if house.type == h.castle then
+        if house.type == h_castle then
           castle_alive = true
         end
         owned_houses += 1
@@ -1542,7 +1531,7 @@ function get_resources(x, y)
   end
 
   local cell = mget2(x, y)
-  local is_resource = fget(cell, f.food) or fget(cell, f.material)
+  local is_resource = fget(cell, f_food) or fget(cell, f_material)
   local key = coord_key(x, y)
   if is_resource and resources[key] == nil then
     resources[key] = flr(rnd(24) + 8)
@@ -1588,17 +1577,17 @@ function make_base_menu()
         change_state("move")
       end)
 
-      if follow.type == u.worker then
+      if follow.type == u_worker then
         local curs_x = flr(curs.x / 8)
         local curs_y = flr(curs.y / 8)
         menu:add("build", make_build_menu, can_build_adj(curs_x, curs_y) ~= false)
       end
 
     elseif follow.is_house then
-      if follow.type == h.cave then
+      if follow.type == h_cave then
         menu:add("awaken", make_hire_menu, follow.action >= follow.cap)
 
-      elseif follow.type == h.castle then
+      elseif follow.type == h_castle then
         menu:add("upgrade", make_upgrade_menu)
       end
     end
@@ -1617,20 +1606,20 @@ function make_build_menu()
   local curs_y = flr(curs.y / 8)
   local build_x, build_y = can_build_adj(curs_x, curs_y)
 
-  menu:add(hc[h.farm] .. " farm", function()
-    build_house(h.farm, cur_player, build_x, build_y)
-    player.materials -= hc[h.farm]
-  end, player.materials >= hc[h.farm])
+  menu:add(hc[h_farm] .. " farm", function()
+    build_house(h_farm, cur_player, build_x, build_y)
+    player.materials -= hc[h_farm]
+  end, player.materials >= hc[h_farm])
 
-  menu:add(hc[h.cave] .. " cave", function()
-    build_house(h.cave, cur_player, build_x, build_y)
-    player.materials -= hc[h.cave]
-  end, player.materials >= hc[h.cave])
+  menu:add(hc[h_cave] .. " cave", function()
+    build_house(h_cave, cur_player, build_x, build_y)
+    player.materials -= hc[h_cave]
+  end, player.materials >= hc[h_cave])
 
-  menu:add(hc[h.tower] .. " tower", function()
-    build_house(h.tower, cur_player, build_x, build_y)
-    player.materials -= hc[h.tower]
-  end, player.materials >= hc[h.tower])
+  menu:add(hc[h_tower] .. " tower", function()
+    build_house(h_tower, cur_player, build_x, build_y)
+    player.materials -= hc[h_tower]
+  end, player.materials >= hc[h_tower])
 end
 
 function make_hire_menu()
@@ -1639,12 +1628,12 @@ function make_hire_menu()
   menu.back = make_base_menu
 
   menu:add("worker", function()
-    hire_unit(u.worker)
+    hire_unit(u_worker)
     follow.action -= follow.cap
   end)
 
   menu:add("warrior", function()
-    hire_unit(u.warrior)
+    hire_unit(u_warrior)
     follow.action -= follow.cap
   end)
 end
@@ -1654,22 +1643,22 @@ function make_upgrade_menu()
   menu:clear()
   menu.back = make_base_menu
 
-  menu:add(hc[h.castle_repair] .. " heal", function()
+  menu:add(hc[h_castle_repair] .. " heal", function()
     follow.health += 1
-    player.materials -= hc[h.castle_repair]
+    player.materials -= hc[h_castle_repair]
     change_state(prev_state)
-  end, player.materials >= hc[h.castle_repair] and follow.health < follow.max_health)
+  end, player.materials >= hc[h_castle_repair] and follow.health < follow.max_health)
 
   if follow.speed == 0 then
-    menu:add(hc[h.castle_tower] .. " tower", function()
+    menu:add(hc[h_castle_tower] .. " tower", function()
       follow.speed += 1
-      player.materials -= hc[h.castle_tower]
+      player.materials -= hc[h_castle_tower]
       change_state(prev_state)
-    end, player.materials >= hc[h.castle_tower])
+    end, player.materials >= hc[h_castle_tower])
 
   else
     if follow.cap > 8 then
-      local cost = hc[h.castle_tower] + (hs[h.castle].cap - follow.cap) / 2
+      local cost = hc[h_castle_tower] + (hs[h_castle].cap - follow.cap) / 2
       menu:add(cost .. " speed", function()
         follow.cap /= 2
         player.materials -= cost
@@ -1684,16 +1673,16 @@ function draw_map()
   local left = cam.x + 8
   local top = cam.y + 8
 
-  spr(t.menu_corner, left, top, 1, 1, false, false)
-  spr(t.menu_corner, left + 104, top, 1, 1, true, false)
-  spr(t.menu_corner, left, top + 104, 1, 1, false, true)
-  spr(t.menu_corner, left + 104, top + 104, 1, 1, true, true)
+  spr(t_menu_corner, left, top, 1, 1, false, false)
+  spr(t_menu_corner, left + 104, top, 1, 1, true, false)
+  spr(t_menu_corner, left, top + 104, 1, 1, false, true)
+  spr(t_menu_corner, left + 104, top + 104, 1, 1, true, true)
 
   for i=1,12 do
-    spr(t.menu_hor, left + i * 8, top, 1, 1, false, false)
-    spr(t.menu_hor, left + i * 8, top + 104, 1, 1, false, true)
-    spr(t.menu_vert, left, top + i * 8, 1, 1, false, false)
-    spr(t.menu_vert, left + 104, top + i * 8, 1, 1, true, false)
+    spr(t_menu_hor, left + i * 8, top, 1, 1, false, false)
+    spr(t_menu_hor, left + i * 8, top + 104, 1, 1, false, true)
+    spr(t_menu_vert, left, top + i * 8, 1, 1, false, false)
+    spr(t_menu_vert, left + 104, top + i * 8, 1, 1, true, false)
   end
 
   rectfill(left + 8, top + 8, left + 103, top + 103, c_darkblue)
@@ -1761,11 +1750,11 @@ function use_resource(x, y, owner, amt)
   local cell = mget2(x, y)
   local player = players[owner]
 
-  if fget(cell, f.food) then
+  if fget(cell, f_food) then
     player.food += amt
   end
 
-  if fget(cell, f.material) then
+  if fget(cell, f_material) then
     player.materials += amt
   end
 
@@ -1784,7 +1773,7 @@ function del_house(house)
   local cell_x = flr(house.x / 8)
   local cell_y = flr(house.y / 8)
   local cell_n = mget2(cell_x, cell_y)
-  if house.type == h.castle then
+  if house.type == h_castle then
     mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
     mset2(cell_x + 1, cell_y, flr(cell_n / 16) * 16)
     mset2(cell_x, cell_y + 1, flr(cell_n / 16) * 16)
@@ -1811,7 +1800,7 @@ function _update()
 
   elseif state == s.command or state == s.play then
     local move_amt = 8
-    if follow and follow.is_house and follow.type == h.castle then
+    if follow and follow.is_house and follow.type == h_castle then
       move_amt = 12
     end
 
@@ -1857,7 +1846,7 @@ function _update()
 
     if follow == nil then
       for house in all(houses) do
-        if house.type == h.castle then
+        if house.type == h_castle then
           if mdst(curs, house) <= 8 then
             follow = house
             break
@@ -1959,9 +1948,9 @@ function _update()
         curs.palette = pal_trans_red
         follow = nil
         change_state("command")
-        sfx(a.ok)
+        sfx(sfx_ok)
       else
-        sfx(a.no)
+        sfx(sfx_no)
       end
     end
 
@@ -2064,12 +2053,12 @@ function _draw()
 
       if btnp(b_left) then
         num_players = max(num_players - 1, min_players)
-        sfx(a.ping)
+        sfx(sfx_ping)
       end
 
       if btnp(b_right) then
         num_players = min(num_players + 1, max_players)
-        sfx(a.ping)
+        sfx(sfx_ping)
       end
 
       if btn(b_o) and btn(b_x) then
