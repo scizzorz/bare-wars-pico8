@@ -1,9 +1,12 @@
 from PIL import Image
 import io
+import random
 rewrite = io.StringIO()
 
+random.seed(2019)
+
 color_map = {
-  (0, 135, 81): 64,
+  (0, 135, 81): lambda: (64 if random.random() < 0.995 else 65),
   (255, 0, 77): 66,
   (171, 82, 54): 68,
   (41, 173, 255): 70,
@@ -28,7 +31,11 @@ with Image.open('map.png') as fp:
       new_map.append([])
 
     for x in range(w):
-      new_map[y % 32].append(color_map.get(pix[x, y], default))
+      tile = color_map.get(pix[x, y], default)
+      if callable(tile):
+        tile = tile()
+
+      new_map[y % 32].append(tile)
 
       if pix[x, y] == castle_color:
         castle_locs.append(f'{{{x}, {y}}}')
