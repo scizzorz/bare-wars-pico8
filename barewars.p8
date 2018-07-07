@@ -100,6 +100,7 @@ t_ui_unit=53
 t_ui_sword=54
 t_ui_pick=55
 t_ui_house=56
+t_ui_gem=57
 
 t_ter_plain = 64
 t_ter_good = 65
@@ -1142,18 +1143,7 @@ function _info:draw()
 
   -- draw resources
   if player ~= nil then
-    spr(t_ui_food, ui_left + 3, top - 1)
-    print(player.food, ui_left + 10, top, c_white)
-
-    spr(t_ui_material, ui_left + 19, top - 1)
-    print(player.materials, ui_left + 26, top, c_white)
-
-    spr(t_ui_house, ui_left + 53, top - 1)
-    print(player.houses, ui_left + 62, top, c_white)
-
-    races[player.race]()
-    spr(t_ui_unit, ui_left + 36, top - 1)
-    print(player.units, ui_left + 44, top, c_white)
+    draw_resources(player, ui_left + 3, top - 1)
   end
 
   -- reset palette swaps
@@ -1233,6 +1223,31 @@ function _info:draw()
   end
 end
 
+function draw_resources(player, x, y, fix_blackbear)
+  local text_y = y + 1
+  spr(t_ui_food, x, y)
+  print(player.food, x + 7, text_y, c_white)
+
+  spr(t_ui_material, x + 16, y)
+  print(player.materials, x + 23, text_y, c_white)
+
+  if fix_blackbear then
+    pal(c_darkblue, c_black)
+    spr(t_ui_house, x + 50, y)
+  end
+  print(player.houses, x + 59, text_y, c_white)
+
+  races[player.race]()
+
+  if fix_blackbear and player.race == 2 then
+    pal(c_brown, c_black)
+    pal(c_black, c_darkgrey)
+  end
+
+  spr(t_ui_unit, x + 33, y)
+  print(player.units, x + 41, text_y, c_white)
+end
+
 -- elements
 units = {}
 houses = {}
@@ -1241,7 +1256,7 @@ prev_state = nil
 state = s.command
 play_timer = 128
 min_players = 2
-max_players = 6
+max_players = 4
 num_players = 2
 turn_idx = 0
 cur_player = 0
@@ -1266,9 +1281,6 @@ function init_players()
   players = {}
   order = {}
   for p=1, num_players do
-    -- decide player race
-    local race = flr(rnd(#races) + 1)
-
     -- decide castle location
     local castle_loc = castle_locs[flr(rnd(#castle_locs) + 1)]
     del(castle_locs, castle_loc)
@@ -1276,7 +1288,7 @@ function init_players()
     local y = castle_loc[2]
 
     -- make a worker unit and a castle house
-    local worker = _unit(p, x * 8, y * 8 + 16, races[race])
+    local worker = _unit(p, x * 8, y * 8 + 16, races[p])
     local castle = _house(p, x * 8 + 4, y * 8 + 4, h_castle)
 
     -- draw castle
@@ -1291,7 +1303,7 @@ function init_players()
     add(players, {
       castle_x=x,
       castle_y=y,
-      race=race,
+      race=p,
       materials=0,
       food=20,
       units=1,
@@ -1666,6 +1678,7 @@ function draw_map()
   local left = cam.x + 8
   local top = cam.y + 8
 
+  -- draw border
   spr(t_menu_corner, left, top)
   spr(t_menu_corner, left + 104, top, 1, 1, true)
   spr(t_menu_corner, left, top + 104, 1, 1, false, true)
@@ -1678,8 +1691,37 @@ function draw_map()
     spr(t_menu_vert, left + 104, top + i * 8, 1, 1, true)
   end
 
+  -- draw backdrop
   rectfill(left + 8, top + 8, left + 103, top + 103, c_darkblue)
 
+  -- draw player stats
+  for i=1, #order do
+    pal()
+    palt()
+    palt(c_red, true)
+    palt(c_black, false)
+
+    -- palette swaps for gem
+    local p = order[i]
+    pal(c_pink, player_colors[p])
+    if cur_player ~= p then
+      pal(c_lightgrey, c_darkgrey)
+    end
+
+    -- draw gem
+    local y = top + 65 + i * 9
+    spr(t_ui_gem, left + 20, y)
+
+    -- draw resources
+    pal()
+    palt(c_red, true)
+    draw_resources(players[p], left + 28, y, true)
+  end
+
+  pal()
+  palt()
+
+  -- draw map
   left += 24
   top += 8
   rectfill(left - 1, top - 1, left + 64, top + 64, c_darkgrey)
@@ -2039,7 +2081,7 @@ function _draw()
         if i == num_players then
           col = player_colors[i]
         end
-        print(i .. "p", i * 16 - 4, 64, col)
+        print(i .. "p", i * 16 + 13, 64, col)
       end
 
       print("press \142+\151", 43, 80, c_lightgrey)
@@ -2185,14 +2227,14 @@ __gfx__
 000000000611111111111111061111110077000000000000000000000000000084b3b3b800000000000000000000000000000000000000000000000000000000
 00000000061111111111111106111111000000000000000000000000000000008444444800000000000000000000000000000000000000000000000000000000
 00000000061111111111111106111111000000000000000000000000000000008888888800000000000000000000000000000000000000000000000000000000
-00000000888888888888888888888888444444448888888888888888888888888888888800000000000000000000000000000000000000000000000000000000
-00000000888878888889988884844488448484448944498888886688886d58888885588800000000000000000000000000000000000000000000000000000000
-00000000888f7788889a7988884444884888e844840404888846d688888555888856658800000000000000000000000000000000000000000000000000000000
-000000008444f888889aa9888499448844888444844044888845688888445d88856dd58800000000000000000000000000000000000000000000000000000000
-0000000084448888889aa98884994888444844448444448884144888844486888565158800000000000000000000000000000000000000000000000000000000
-000000008444888888899888884488884444444484999488844888888448888885d1158800000000000000000000000000000000000000000000000000000000
-00000000888888888888888888888888444444448888888888888888888888888888888800000000000000000000000000000000000000000000000000000000
-00000000888888888888888888888888444444448888888888888888888888888888888800000000000000000000000000000000000000000000000000000000
+00000000888888888888888888888888444444448888888888888888888888888888888888888888000000000000000000000000000000000000000000000000
+00000000888878888889988884844488448484448944498888886688886d58888885588888666888000000000000000000000000000000000000000000000000
+00000000888f7788889a7988884444884888e844840404888846d688888555888856658886ee7688000000000000000000000000000000000000000000000000
+000000008444f888889aa9888499448844888444844044888845688888445d88856dd58886eee688000000000000000000000000000000000000000000000000
+0000000084448888889aa98884994888444844448444448884144888844486888565158886eee688000000000000000000000000000000000000000000000000
+000000008444888888899888884488884444444484999488844888888448888885d1158888666888000000000000000000000000000000000000000000000000
+00000000888888888888888888888888444444448888888888888888888888888888888888888888000000000000000000000000000000000000000000000000
+00000000888888888888888888888888444444448888888888888888888888888888888888888888000000000000000000000000000000000000000000000000
 333333333333333333333333333333333333333333333333333333330000000033335535535533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 3333333333bb333333bbbb3333344333333bb33333333333333333330000000033335555555533333335d6dd6dd65333bbbbbbbbbbbbbbbbbbbbbbbbbbb333bb
 3333333333b333b33b2b2bb33344443333bbbb3333333333333333330000000033335666666533333335666666665333bbbbbbbbbbbbbbbbbbbbbbbb33338333
