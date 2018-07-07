@@ -1458,8 +1458,7 @@ function next_turn()
 
       for house in all(houses) do
         if house.owner == p then
-          del(houses, house)
-          players[p].houses -= 1
+          del_house(house)
         end
       end
     end
@@ -1661,6 +1660,26 @@ function use_resource(x, y, owner, amt)
   end
 end
 
+function del_house(house)
+  del(houses, house)
+  if houses[house.owner] and houses[house.owner].houses then
+    houses[house.owner].houses -= 1
+  end
+
+  -- reset terrain to neutral
+  local cell_x = flr(house.x / 8)
+  local cell_y = flr(house.y / 8)
+  local cell_n = mget2(cell_x, cell_y)
+  if house.type == h.castle then
+    mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
+    mset2(cell_x + 1, cell_y, flr(cell_n / 16) * 16)
+    mset2(cell_x, cell_y + 1, flr(cell_n / 16) * 16)
+    mset2(cell_x + 1, cell_y + 1, flr(cell_n / 16) * 16 + 3)
+  else
+    mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
+  end
+end
+
 function _init()
   -- next_turn()
   change_state("splash")
@@ -1836,23 +1855,7 @@ function _update()
     for house in all(houses) do
       house:update()
       if house.health <= 0 then
-        del(houses, house)
-        if houses[house.owner] and houses[house.owner].houses then
-          houses[house.owner].houses -= 1
-        end
-
-        -- reset terrain to neutral
-        local cell_x = flr(house.x / 8)
-        local cell_y = flr(house.y / 8)
-        local cell_n = mget2(cell_x, cell_y)
-        if house.type == h.castle then
-          mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
-          mset2(cell_x + 1, cell_y, flr(cell_n / 16) * 16)
-          mset2(cell_x, cell_y + 1, flr(cell_n / 16) * 16)
-          mset2(cell_x + 1, cell_y + 1, flr(cell_n / 16) * 16 + 3)
-        else
-          mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
-        end
+        del_house(house)
       end
     end
 
