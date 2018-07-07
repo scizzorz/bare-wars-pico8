@@ -33,6 +33,7 @@ b_up = 2
 b_down = 3
 b_o = 4
 b_x = 5
+b_pause = 6
 
 -- colors
 c_black=0
@@ -2151,6 +2152,13 @@ function _draw()
     end
 
   else
+    if abtnp(b_pause) then
+      if not map_open then
+        map_open = true
+        poke(0x5f30,1)
+      end
+    end
+
     map(0, 0, 0, 0, 64, 32)
     map(64, 0, 0, 256, 64, 32)
 
