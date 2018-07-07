@@ -1556,7 +1556,7 @@ function make_base_menu()
         menu:add("awaken", make_hire_menu, follow.action >= follow.cap)
 
       elseif follow.type == h.castle then
-        menu:add("upgrade", make_upgrade_menu, follow.cap > 8)
+        menu:add("upgrade", make_upgrade_menu)
       end
     end
   end
@@ -1624,13 +1624,16 @@ function make_upgrade_menu()
     end, player.materials >= hc[h.castle_tower])
 
   else
-    local cost = hc[h.castle_tower] + (hs[h.castle].cap - follow.cap) / 2
-    menu:add(cost .. " speed", function()
-      follow.cap -= 8
-      player.materials -= cost
-      change_state(prev_state)
-    end, player.materials >= cost)
+    if follow.cap > 8 then
+      local cost = hc[h.castle_tower] + (hs[h.castle].cap - follow.cap) / 2
+      menu:add(cost .. " speed", function()
+        follow.cap /= 2
+        player.materials -= cost
+        change_state(prev_state)
+      end, player.materials >= cost)
+    end
   end
+
 end
 
 function use_resource(x, y, owner, amt)
