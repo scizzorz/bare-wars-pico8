@@ -1226,7 +1226,7 @@ function _info:draw()
   end
 end
 
-function draw_resources(player, x, y, fix_blackbear)
+function draw_resources(player, x, y, fix_black)
   local text_y = y + 1
   spr(t_ui_food, x, y)
   print(player.food, x + 7, text_y, c_white)
@@ -1234,15 +1234,16 @@ function draw_resources(player, x, y, fix_blackbear)
   spr(t_ui_material, x + 16, y)
   print(player.materials, x + 23, text_y, c_white)
 
-  if fix_blackbear then
+  if fix_black then
     pal(c_darkblue, c_black)
-    spr(t_ui_house, x + 50, y)
   end
+
+  spr(t_ui_house, x + 50, y)
   print(player.houses, x + 59, text_y, c_white)
 
   races[player.race]()
 
-  if fix_blackbear and player.race == 2 then
+  if fix_black and player.race == 2 then
     pal(c_brown, c_black)
     pal(c_black, c_darkgrey)
   end
