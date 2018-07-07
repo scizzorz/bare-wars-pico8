@@ -61,7 +61,6 @@ s = {
   menu=3,
   move=4,
   win=5,
-  map=6,
 }
 
 -- tiles
@@ -1249,6 +1248,7 @@ turn_idx = 0
 cur_player = 0
 players = {}
 order = {}
+map_open = false
 
 cam = _camera()
 curs = _sprite(an_curs:copy(), 64, 64, pal_trans_red)
@@ -1587,7 +1587,7 @@ function make_base_menu()
     end
   end
 
-  menu:add("map", function() change_state("map") end)
+  menu:add("map", function() change_state(prev_state) map_open = true end)
   menu:add("end turn", next_turn)
 end
 
@@ -1843,12 +1843,16 @@ function _update()
     end
 
     if btnp(b_x) then
-      if state == s.command then
+      if map_open then
+        map_open = false
+      elseif state == s.command then
         make_base_menu()
 
         if #menu.labels > 0 then
           change_state("menu")
         end
+      elseif state == s.play then
+        map_open = true
       end
     end
 
@@ -1874,11 +1878,6 @@ function _update()
     end
 
     menu:update()
-
-  elseif state == s.map then
-    if btnp(b_x) or btnp(b_o) then
-      change_state("command")
-    end
 
   elseif state == s.move then
     if btnp(b_left) then
@@ -2072,12 +2071,6 @@ function _draw()
       print("      \142", 43, 80, col)
     end
 
-  elseif state == s.map then
-    map(0, 0, 0, 0, 64, 32)
-    map(64, 0, 0, 256, 64, 32)
-    player_ui:draw()
-    draw_map()
-
   else
     map(0, 0, 0, 0, 64, 32)
     map(64, 0, 0, 256, 64, 32)
@@ -2135,6 +2128,10 @@ function _draw()
 
     if state == s.play then
       play_meter:draw()
+    end
+
+    if map_open then
+      draw_map()
     end
   end
 end
