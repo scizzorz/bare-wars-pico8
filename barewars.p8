@@ -195,7 +195,7 @@ ucol = {
 hcol = {
   [h.castle] = c_indigo,
   [h.tower] = c_darkgrey,
-  [h.cave] = c_blue,
+  [h.cave] = c_darkblue,
   [h.farm] = c_green,
 }
 
