@@ -324,9 +324,9 @@ function coord_key(x, y)
   return x .. "_" .. y
 end
 
-function get_path(fx, fy, tx, ty)
+function get_path(from_x, from_y, to_x, to_y)
   local path={}
-  local start={fx, fy}
+  local start={from_x, from_y}
   local flood={start}
   local camefrom={}
 
@@ -335,11 +335,11 @@ function get_path(fx, fy, tx, ty)
   while #flood > 0 do
     local current = flood[1]
 
-    if (current[1] == tx and current[2] == ty) then break end
+    if (current[1] == to_x and current[2] == to_y) then break end
 
     neighbs = get_neighbors(current[1], current[2])
-    if mdst({x=current[1], y=current[2]}, {x=tx, y=ty}) == 1 then
-      add(neighbs, {tx, ty})
+    if mdst({x=current[1], y=current[2]}, {x=to_x, y=to_y}) == 1 then
+      add(neighbs, {to_x, to_y})
     end
 
     if #neighbs > 0 then
@@ -360,7 +360,7 @@ function get_path(fx, fy, tx, ty)
     del(flood,current)
   end
 
-  local c = {tx, ty}
+  local c = {to_x, to_y}
   while camefrom[coord_key(c)] ~= nil do
     add(path, c)
     c = camefrom[coord_key(c)]
