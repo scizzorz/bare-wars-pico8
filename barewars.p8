@@ -1683,6 +1683,11 @@ function draw_map()
     local player = players[p]
     pset(left + player.castle_x, top + player.castle_y, player_colors[p])
   end
+  if (frame % 32) < 16 then
+    local curs_x = flr(curs.x / 8)
+    local curs_y = flr(curs.y / 8)
+    pset(left + curs_x, top + curs_y, player_colors[cur_player])
+  end
 end
 
 function use_resource(x, y, owner, amt)
@@ -1737,9 +1742,11 @@ function _init()
   change_state("splash")
 end
 
+frame = 0
 function _update()
   pbtns = btns
   btns = {[0]=btn(0), [1]=btn(1), [2]=btn(2), [3]=btn(3), [4]=btn(4), [5]=btn(5)}
+  frame += 1
 
   if state == s.splash or state == s.win then
     cam.x = 0
