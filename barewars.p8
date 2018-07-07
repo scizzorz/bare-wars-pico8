@@ -1040,15 +1040,9 @@ function _meter:draw()
   palt()
 end
 
--- infobar class
-_info = object:extend()
 
-function _info:init()
-  self.x = 0
-  self.y = 0
-end
-
-function _info:draw()
+-- user interface
+function draw_info()
   palt(c_black, false)
   palt(c_red, true)
 
@@ -1103,8 +1097,8 @@ function _info:draw()
     end
   end
 
-  local left = self.x + cam.x
-  local top = self.y + cam.y
+  local left = cam.x
+  local top = cam.y
   local ui_start = ui_slot
   local ui_end = 16 - #order + ui_slot
   local ui_left = left + ui_start * 8
@@ -1276,7 +1270,6 @@ curs = _sprite(an_curs:copy(), 64, 64, pal_trans_red)
 sel_curs = _sprite(an_curs:copy(), 64, 64, pal_sel_curs)
 play_meter = _meter()
 play_meter.y = 120
-player_ui = _info()
 menu = _menu()
 follow = nil
 
@@ -2242,7 +2235,7 @@ function _draw()
     end
 
     if state == s.menu or state == s.command or state == s.move or state == s.play then
-      player_ui:draw()
+      draw_info()
     end
 
     if state == s.menu then
