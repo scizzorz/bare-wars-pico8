@@ -677,28 +677,30 @@ function _unit:update()
   local path = self.path
   if path and #path > 0 then
     local waypoint = path[#path]
+    local wx = waypoint[1] * 8
+    local wy = waypoint[2] * 8
 
     -- move to waypoint
-    if self.x < waypoint[1] * 8 then
+    if self.x < wx then
       self.x += 1
       self.flipx = false
     end
 
-    if self.x > waypoint[1] * 8 then
+    if self.x > wx then
       self.x -= 1
       self.flipx = true
     end
 
-    if self.y < waypoint[2] * 8 then
+    if self.y < wy then
       self.y += 1
     end
 
-    if self.y > waypoint[2] * 8 then
+    if self.y > wy then
       self.y -= 1
     end
 
     -- pop current waypoint if we're at it
-    if self.x == waypoint[1] * 8 and self.y == waypoint[2] * 8 then
+    if self.x == wx and self.y == wy then
       path[#path] = nil
 
       if #path == 0 then
