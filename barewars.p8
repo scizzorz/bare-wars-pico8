@@ -1709,7 +1709,7 @@ function draw_map()
     end
 
     -- draw gem
-    local y = top + 65 + i * 9
+    local y = top + 65 + p * 9
     spr(t_ui_gem, left + 20, y)
 
     -- draw resources
