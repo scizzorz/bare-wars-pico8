@@ -962,22 +962,22 @@ function _menu:draw()
   end
 
   -- corners + fill
-  spr(t_menu_corner, left, top, 1, 1, false, false)
-  spr(t_menu_corner, right, top, 1, 1, true, false)
+  spr(t_menu_corner, left, top)
+  spr(t_menu_corner, right, top, 1, 1, true)
   spr(t_menu_corner, left, bottom, 1, 1, false, true)
   spr(t_menu_corner, right, bottom, 1, 1, true, true)
   rectfill(left + 8, top + 8, right - 1, bottom - 1, c_darkblue)
 
   -- horizontal walls
   for x=1, width do
-    spr(t_menu_hor, left + 8 * x, top, 1, 1, false, false)
+    spr(t_menu_hor, left + 8 * x, top)
     spr(t_menu_hor, left + 8 * x, bottom, 1, 1, false, true)
   end
 
   -- vertical walls
   for y=1, height - 1 do
-    spr(t_menu_vert, left, top + 8 * y, 1, 1, false, false)
-    spr(t_menu_vert, right, top + 8 * y, 1, 1, true, false)
+    spr(t_menu_vert, left, top + 8 * y)
+    spr(t_menu_vert, right, top + 8 * y, 1, 1, true)
   end
 
   --text
@@ -1029,13 +1029,13 @@ function _meter:draw()
   line(left + 2, top + 4, left + 2 + fill, top + 4, self.base)
   line(left + 2, top + 5, left + 2 + fill, top + 5, self.lo)
 
-  spr(t_meter_end, left, top, 1, 1, false, false)
+  spr(t_meter_end, left, top)
 
   for n=1, ceil((self.width - 16)/8) do
     spr(t_meter_mid, left + 8 * n, top)
   end
 
-  spr(t_meter_end, left + self.width - 8, top, 1, 1, true, false)
+  spr(t_meter_end, left + self.width - 8, top, 1, 1, true)
 
   palt()
 end
@@ -1673,16 +1673,16 @@ function draw_map()
   local left = cam.x + 8
   local top = cam.y + 8
 
-  spr(t_menu_corner, left, top, 1, 1, false, false)
-  spr(t_menu_corner, left + 104, top, 1, 1, true, false)
+  spr(t_menu_corner, left, top)
+  spr(t_menu_corner, left + 104, top, 1, 1, true)
   spr(t_menu_corner, left, top + 104, 1, 1, false, true)
   spr(t_menu_corner, left + 104, top + 104, 1, 1, true, true)
 
   for i=1,12 do
-    spr(t_menu_hor, left + i * 8, top, 1, 1, false, false)
+    spr(t_menu_hor, left + i * 8, top)
     spr(t_menu_hor, left + i * 8, top + 104, 1, 1, false, true)
-    spr(t_menu_vert, left, top + i * 8, 1, 1, false, false)
-    spr(t_menu_vert, left + 104, top + i * 8, 1, 1, true, false)
+    spr(t_menu_vert, left, top + i * 8)
+    spr(t_menu_vert, left + 104, top + i * 8, 1, 1, true)
   end
 
   rectfill(left + 8, top + 8, left + 103, top + 103, c_darkblue)
