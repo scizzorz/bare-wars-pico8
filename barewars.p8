@@ -152,7 +152,7 @@ hc = {
 -- house stats
 hs = {
   [h.castle] = {tile=t.blank, health=12, cap=64, speed=0},
-  [h.tower] = {tile=t.tower, health=8, cap=64},
+  [h.tower] = {tile=t.tower, health=8, cap=16},
   [h.cave] = {tile=t.cave, health=6, cap=256},
   [h.farm] = {tile=t.farm, health=4, cap=64},
 }
