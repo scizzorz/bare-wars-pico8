@@ -2164,10 +2164,13 @@ function _draw()
 
     for p in all(order) do
       local player = players[p]
-      pset(player.castle_x * 8 + 1, player.castle_y * 8 + 5, player_colors[p])
-      pset(player.castle_x * 8 + 2, player.castle_y * 8 + 4, player_colors[p])
-      pset(player.castle_x * 8 + 2, player.castle_y * 8 + 5, player_colors[p])
-      pset(player.castle_x * 8 + 2, player.castle_y * 8 + 6, player_colors[p])
+      local px = player.castle_x * 8
+      local py = player.castle_y * 8
+      local pc = player_colors[p]
+      pset(px + 1, py + 5, pc)
+      pset(px + 2, py + 4, pc)
+      pset(px + 2, py + 5, pc)
+      pset(px + 2, py + 6, pc)
     end
 
     -- mark selectable cells
