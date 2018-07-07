@@ -703,10 +703,10 @@ function _unit:draw()
   if self ~= follow then
     local col = c.pink
     for i=1,self.max_health do
-      pset(self.x + i - 1, self.y, col)
-      if i == self.health then
+      if i > self.health then
         col = c.darkblue
       end
+      pset(self.x + i - 1, self.y, col)
     end
     pset(self.x, self.y + 7, player_colors[self.owner])
   end
@@ -819,10 +819,11 @@ function _house:draw()
   if self ~= follow and self.type ~= h.castle then
     local col = c.pink
     for i=1,self.max_health do
-      pset(self.x + i - 1, self.y, col)
-      if i == self.health then
+      if i > self.health then
         col = c.darkblue
       end
+
+      pset(self.x + i - 1, self.y, col)
     end
     pset(self.x, self.y + 6, player_colors[self.owner])
   end
@@ -1175,15 +1176,17 @@ function _info:draw()
     end
 
     -- hearts need a wacky palette swap
+    pal()
+    palt()
     palt(c.red, false)
     palt(c.brown, true)
 
     for i=1, follow.max_health do
-      spr(t.ui_heart, ui_left + i * 6 - 2, top + 6)
-      if i == follow.health then
+      if i > follow.health then
         pal(c.red, c.darkblue)
         pal(c.pink, c.indigo)
       end
+      spr(t.ui_heart, ui_left + i * 6 - 2, top + 6)
     end
   end
 
