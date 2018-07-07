@@ -228,27 +228,7 @@ function mget2(x, y)
   return mget(x, y)
 end
 
-
--- https://www.lexaloffle.com/bbs/?tid=3389
-function pop(stack)
-  local v = stack[#stack]
-  stack[#stack]=nil
-  return v
-end
-
--- https://github.com/clowerweb/lib-pico8/blob/9580f8afd84dfa3f33e0c9c9131a595ede1f0a2a/distance.lua
-function dst(o1, o2)
- return sqrt(sqr(o1.x - o2.x) + sqr(o1.y - o2.y))
-end
-
-function sqr(x) return x * x end
-
--- mine: tile distance
-function tdst(o1, o2)
- return sqrt(sqr(o1.x/8 - o2.x/8) + sqr(o1.y/8 - o2.y/8))
-end
-
--- mine: manhattan distance
+-- manhattan distance of two objects
 function mdst(o1, o2)
   return abs(o1.x - o2.x) + abs(o1.y - o2.y)
 end
@@ -719,7 +699,8 @@ function _unit:update()
 
     -- pop current waypoint if we're at it
     if self.x == waypoint[1] * 8 and self.y == waypoint[2] * 8 then
-      pop(path)
+      path[#path] = nil
+
       if #path == 0 then
         self.tile = an_stand[self.type]
         self.path = nil
