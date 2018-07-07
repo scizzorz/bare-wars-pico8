@@ -957,13 +957,15 @@ function _menu:draw()
 
   -- move out of way of cursor
   if curs.x < right then
-    left += 116 - right
-    right += 116 - right
+    local wid = right - left
+    right = cam.x + 116
+    left = right - wid
   end
 
   if curs.y < bottom then
-    top += 116 - bottom
-    bottom += 116 - bottom
+    local hei = bottom - top
+    bottom = cam.y + 116
+    top = bottom - hei
   end
 
   -- corners + fill
