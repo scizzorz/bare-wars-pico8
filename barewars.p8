@@ -1809,7 +1809,14 @@ function _update()
         local cell_x = flr(house.x / 8)
         local cell_y = flr(house.y / 8)
         local cell_n = mget2(cell_x, cell_y)
-        mset2(cell_x, cell_y, flr(cell_n / 16) * 16)
+        if house.type == h.castle then
+          mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
+          mset2(cell_x + 1, cell_y, flr(cell_n / 16) * 16)
+          mset2(cell_x, cell_y + 1, flr(cell_n / 16) * 16)
+          mset2(cell_x + 1, cell_y + 1, flr(cell_n / 16) * 16 + 3)
+        else
+          mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
+        end
       end
     end
 
