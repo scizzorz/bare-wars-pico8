@@ -998,21 +998,15 @@ end
 -- meter class
 _meter = object:extend()
 
-function _meter:init(cap, transparent, base, hi, lo, bg)
+function _meter:init()
   self.x = 0
   self.y = 0
   self.width = 128
-  self.cap = cap or 128
-  self.amt = self.cap
-  self.transparent = transparent or c_red
-  self.base = base or c_red
-  self.hi = hi or c_pink
-  self.lo = lo or c_indigo
-  self.bg = bg or c_darkblue
+  self.amt = 128
 end
 
 function _meter:fill(amt)
-  self.amt = min(self.cap, max(0, amt))
+  self.amt = min(128, max(0, amt))
 end
 
 function _meter:draw()
@@ -1021,21 +1015,20 @@ function _meter:draw()
 
   local left = self.x + cam.x
   local top = self.y + cam.y
-  local fill = self.amt / self.cap * (self.width - 4)
+  local fill = self.amt / 128 * 124
 
-  rectfill(left + 2, top + 2, left + 2 + self.width - 4, top + 6, self.bg)
-  line(left + 2, top + 2, left + 2 + fill, top + 2, self.hi)
-  line(left + 2, top + 3, left + 2 + fill, top + 3, self.base)
-  line(left + 2, top + 4, left + 2 + fill, top + 4, self.base)
-  line(left + 2, top + 5, left + 2 + fill, top + 5, self.lo)
+  rectfill(left + 2, top + 2, left + 2 + 124, top + 6, c_darkblue)
+  line(left + 2, top + 2, left + 2 + fill, top + 2, c_pink)
+  rect(left + 2, top + 3, left + 2 + fill, top + 4, c_red)
+  line(left + 2, top + 5, left + 2 + fill, top + 5, c_indigo)
 
   spr(t_meter_end, left, top)
 
-  for n=1, ceil((self.width - 16)/8) do
+  for n=1, 14 do
     spr(t_meter_mid, left + 8 * n, top)
   end
 
-  spr(t_meter_end, left + self.width - 8, top, 1, 1, true)
+  spr(t_meter_end, left + 120, top, 1, 1, true)
 
   palt()
 end
