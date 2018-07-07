@@ -1996,6 +1996,16 @@ function _update()
       follow:set_dest(follow.x, follow.y)
     end
 
+    for unit in all(units) do
+      if unit ~= follow then
+        if (unit.x == curs.x and unit.y == curs.y) or (unit.tx == curs.x and unit.ty == curs.y) then
+          curs.palette = pal_bad_curs
+          follow:set_dest(follow.x, follow.y)
+          break
+        end
+      end
+    end
+
     if abtnp(b_x) then
       if curs.palette == pal_trans_red then
         curs.palette = pal_trans_red
