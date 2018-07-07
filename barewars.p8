@@ -9,24 +9,39 @@ castle_locs = {{25, 5}, {10, 10}, {52, 10}, {37, 13}, {46, 22}, {2, 23}, {57, 25
 -- END AUTOGEN
 
 -- buttons
-b = {left=0, right=1, up=2, down=3, o=4, x=5}
+b_left = 0
+b_right = 1
+b_up = 2
+b_down = 3
+b_o = 4
+b_x = 5
 
 -- colors
-c = {
-  black=0, darkblue=1, darkpurple=2, darkgreen=3,
-  brown=4, darkgrey=5, lightgrey=6, white=7,
-  red=8, orange=9, yellow=10, green=11,
-  blue=12, indigo=13, pink=14, peach=15,
-}
+c_black=0
+c_darkblue=1
+c_darkpurple=2
+c_darkgreen=3
+c_brown=4
+c_darkgrey=5
+c_lightgrey=6
+c_white=7
+c_red=8
+c_orange=9
+c_yellow=10
+c_green=11
+c_blue=12
+c_indigo=13
+c_pink=14
+c_peach=15
 
 -- player colors
 player_colors = {
-  c.red,    -- 1
-  c.blue,   -- 2
-  c.orange, -- 3
-  c.pink,   -- 4
-  c.yellow, -- 5
-  c.green,  -- 6
+  c_red,    -- 1
+  c_blue,   -- 2
+  c_orange, -- 3
+  c_pink,   -- 4
+  c_yellow, -- 5
+  c_green,  -- 6
 }
 
 -- flags
@@ -106,12 +121,12 @@ t = {
 
 -- map colors
 tc = {
-  [t.ter_plain] = c.darkgreen,
-  [t.ter_good] = c.darkgreen,
-  [t.ter_food] = c.red,
-  [t.ter_honey] = c.orange,
-  [t.ter_material] = c.brown,
-  [t.ter_build] = c.lightgrey,
+  [t.ter_plain] = c_darkgreen,
+  [t.ter_good] = c_darkgreen,
+  [t.ter_food] = c_red,
+  [t.ter_honey] = c_orange,
+  [t.ter_material] = c_brown,
+  [t.ter_build] = c_lightgrey,
 }
 
 -- sfx
@@ -364,7 +379,7 @@ function get_path(from_x, from_y, to_x, to_y)
 
           -- awesome flood debugging
           if false then
-            rectfill(neighb[1]*8, neighb[2]*8, (neighb[1]*8)+7, (neighb[2]*8)+7, c.blue)
+            rectfill(neighb[1]*8, neighb[2]*8, (neighb[1]*8)+7, (neighb[2]*8)+7, c_blue)
             flip()
           end
         end
@@ -545,51 +560,51 @@ an_curs = _anim({t.curs1, t.curs2, t.curs3, t.curs4}, 10)
 
 -- palettes
 function pal_trans_red()
-  palt(c.red, true)
-  palt(c.black, false)
+  palt(c_red, true)
+  palt(c_black, false)
 end
 
 function pal_sel_curs()
-  palt(c.red, true)
-  palt(c.black, false)
+  palt(c_red, true)
+  palt(c_black, false)
   if follow then
-    pal(c.black, player_colors[follow.owner])
+    pal(c_black, player_colors[follow.owner])
   else
-    pal(c.black, c.white)
+    pal(c_black, c_white)
   end
 end
 
 function pal_bad_curs()
-  palt(c.red, true)
-  palt(c.black, false)
-  pal(c.black, c.darkpurple)
+  palt(c_red, true)
+  palt(c_black, false)
+  pal(c_black, c_darkpurple)
 end
 
 function pal_race1()
-  palt(c.red, true)
-  palt(c.black, false)
+  palt(c_red, true)
+  palt(c_black, false)
 end
 
 function pal_race2()
-  palt(c.red, true)
-  palt(c.black, false)
-  pal(c.brown, c.darkblue)
-  pal(c.orange, c.brown)
+  palt(c_red, true)
+  palt(c_black, false)
+  pal(c_brown, c_darkblue)
+  pal(c_orange, c_brown)
 end
 
 function pal_race3()
-  palt(c.red, true)
-  palt(c.black, false)
-  pal(c.brown, c.white)
-  pal(c.orange, c.blue)
+  palt(c_red, true)
+  palt(c_black, false)
+  pal(c_brown, c_white)
+  pal(c_orange, c_blue)
 end
 
 function pal_race4()
-  palt(c.red, true)
-  palt(c.black, false)
-  pal(c.black, c.lightgrey)
-  pal(c.brown, c.white)
-  pal(c.orange, c.darkgrey)
+  palt(c_red, true)
+  palt(c_black, false)
+  pal(c_black, c_lightgrey)
+  pal(c_brown, c_white)
+  pal(c_orange, c_darkgrey)
 end
 
 races = {pal_race1, pal_race2, pal_race3, pal_race4}
@@ -712,10 +727,10 @@ function _unit:draw()
   end
 
   if self ~= follow then
-    local col = c.pink
+    local col = c_pink
     for i=1,self.max_health do
       if i > self.health then
-        col = c.darkblue
+        col = c_darkblue
       end
       pset(self.x + i - 1, self.y, col)
     end
@@ -828,10 +843,10 @@ end
 
 function _house:draw()
   if self ~= follow and self.type ~= h.castle then
-    local col = c.pink
+    local col = c_pink
     for i=1,self.max_health do
       if i > self.health then
-        col = c.darkblue
+        col = c_darkblue
       end
 
       pset(self.x + i - 1, self.y, col)
@@ -841,7 +856,7 @@ function _house:draw()
 
   local fill = min(flr(self.action / self.cap * 8), 7)
   if fill > 0 then
-    line(self.x, self.y + 7, self.x + fill, self.y + 7, c.orange)
+    line(self.x, self.y + 7, self.x + fill, self.y + 7, c_orange)
   end
 
   self.__super.draw(self)
@@ -946,7 +961,7 @@ function _menu:draw()
   spr(t.menu_corner, right, top, 1, 1, true, false)
   spr(t.menu_corner, left, bottom, 1, 1, false, true)
   spr(t.menu_corner, right, bottom, 1, 1, true, true)
-  rectfill(left + 8, top + 8, right - 1, bottom - 1, c.darkblue)
+  rectfill(left + 8, top + 8, right - 1, bottom - 1, c_darkblue)
 
   -- horizontal walls
   for x=1, width do
@@ -962,13 +977,13 @@ function _menu:draw()
 
   --text
   for y=1, height do
-    local col = c.lightgrey
+    local col = c_lightgrey
     if y == self.idx then
-      col = c.white
+      col = c_white
       spr(t.menu_arr, left + 2, top - 4 + 8 * y)
     end
     if not self.enables[y] then
-      col = c.darkgrey
+      col = c_darkgrey
     end
 
     print(self.labels[y], left + 10, top - 3 + 8 * y, col)
@@ -984,11 +999,11 @@ function _meter:init(cap, transparent, base, hi, lo, bg)
   self.width = 128
   self.cap = cap or 128
   self.amt = self.cap
-  self.transparent = transparent or c.red
-  self.base = base or c.red
-  self.hi = hi or c.pink
-  self.lo = lo or c.indigo
-  self.bg = bg or c.darkblue
+  self.transparent = transparent or c_red
+  self.base = base or c_red
+  self.hi = hi or c_pink
+  self.lo = lo or c_indigo
+  self.bg = bg or c_darkblue
 end
 
 function _meter:fill(amt)
@@ -996,8 +1011,8 @@ function _meter:fill(amt)
 end
 
 function _meter:draw()
-  palt(c.black, false)
-  palt(c.red, true)
+  palt(c_black, false)
+  palt(c_red, true)
 
   local left = self.x + cam.x
   local top = self.y + cam.y
@@ -1029,8 +1044,8 @@ function _info:init()
 end
 
 function _info:draw()
-  palt(c.black, false)
-  palt(c.red, true)
+  palt(c_black, false)
+  palt(c_red, true)
 
   local player_num = cur_player
   if follow ~= nil then
@@ -1057,13 +1072,13 @@ function _info:draw()
     local unit = units[i]
 
     if follow == unit then
-      rectfill(left - 1, top - 1, left + 1, top + 1, c.darkgrey)
+      rectfill(left - 1, top - 1, left + 1, top + 1, c_darkgrey)
     end
 
     pset(left, top, player_colors[units[i].owner])
 
     if unit.x ~= unit.tx or unit.y ~= unit.ty then
-      pset(left + 1, top, c.yellow)
+      pset(left + 1, top, c_yellow)
     end
 
   end
@@ -1073,13 +1088,13 @@ function _info:draw()
     local left = 5 + cam.x
     local house = houses[i]
     if follow == house then
-      rectfill(left - 1, top - 1, left + 1, top + 1, c.darkgrey)
+      rectfill(left - 1, top - 1, left + 1, top + 1, c_darkgrey)
     end
 
     pset(left, top, player_colors[houses[i].owner])
 
     if (house.action >= house.cap) and (house.type == h.cave) then
-      pset(left + 1, top, c.yellow)
+      pset(left + 1, top, c_yellow)
     end
   end
 
@@ -1091,13 +1106,13 @@ function _info:draw()
   local ui_right = left + ui_end * 8 - 16
 
   for p=1, #order do
-    local border_col = c.darkgrey
+    local border_col = c_darkgrey
     if order[p] == cur_player then
-      border_col = c.lightgrey
+      border_col = c_lightgrey
     end
 
-    pal(c.lightgrey, border_col)
-    pal(c.pink, player_colors[order[p]])
+    pal(c_lightgrey, border_col)
+    pal(c_pink, player_colors[order[p]])
 
     if p < ui_slot then
       spr(t.ui_left_gem, left + 8 * (p - 1), top)
@@ -1118,35 +1133,35 @@ function _info:draw()
   end
   spr(t.ui_mid_nogem, left + ui_end * 8 - 12, top + 7)
 
-  rectfill(ui_left, top, left + ui_end * 8 - 1, top + 6, c.black)
+  rectfill(ui_left, top, left + ui_end * 8 - 1, top + 6, c_black)
 
   spr(t.ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
   spr(t.ui_corner, left + ui_end * 8 - 4, top + 7, 1, 1, true)
 
   -- reset palette swaps from the gems
   pal()
-  palt(c.red, true)
+  palt(c_red, true)
 
   -- draw resources
   if player ~= nil then
     spr(t.ui_food, ui_left + 3, top - 1)
-    print(player.food, ui_left + 10, top, c.white)
+    print(player.food, ui_left + 10, top, c_white)
 
     spr(t.ui_material, ui_left + 19, top - 1)
-    print(player.materials, ui_left + 26, top, c.white)
+    print(player.materials, ui_left + 26, top, c_white)
 
     spr(t.ui_house, ui_left + 53, top - 1)
-    print(player.houses, ui_left + 62, top, c.white)
+    print(player.houses, ui_left + 62, top, c_white)
 
     races[player.race]()
     spr(t.ui_unit, ui_left + 36, top - 1)
-    print(player.units, ui_left + 44, top, c.white)
+    print(player.units, ui_left + 44, top, c_white)
   end
 
   -- reset palette swaps
   pal()
-  palt(c.red, true)
-  palt(c.black, false)
+  palt(c_red, true)
+  palt(c_black, false)
 
   -- draw focused map info
   local curs_x = flr(curs.x / 8)
@@ -1171,7 +1186,7 @@ function _info:draw()
     elseif res >= 10 then
       offx = -6
     end
-    print(res, ui_right + offx, top + 7, c.white)
+    print(res, ui_right + offx, top + 7, c_white)
   end
 
   -- draw focused unit stats
@@ -1189,13 +1204,13 @@ function _info:draw()
     -- hearts need a wacky palette swap
     pal()
     palt()
-    palt(c.red, false)
-    palt(c.brown, true)
+    palt(c_red, false)
+    palt(c_brown, true)
 
     for i=1, follow.max_health do
       if i > follow.health then
-        pal(c.red, c.darkblue)
-        pal(c.pink, c.indigo)
+        pal(c_red, c_darkblue)
+        pal(c_pink, c_indigo)
       end
       spr(t.ui_heart, ui_left + i * 6 - 2, top + 6)
     end
@@ -1664,11 +1679,11 @@ function draw_map()
     spr(t.menu_vert, left + 104, top + i * 8, 1, 1, true, false)
   end
 
-  rectfill(left + 8, top + 8, left + 103, top + 103, c.darkblue)
+  rectfill(left + 8, top + 8, left + 103, top + 103, c_darkblue)
 
   left += 24
   top += 8
-  rectfill(left - 1, top - 1, left + 64, top + 64, c.darkgrey)
+  rectfill(left - 1, top - 1, left + 64, top + 64, c_darkgrey)
 
   for x=0,63 do
     for y=0,63 do
@@ -1758,32 +1773,32 @@ function _update()
       move_amt = 12
     end
 
-    if btnp(b.left) then
-      if btns[b.o] then
+    if btnp(b_left) then
+      if btns[b_o] then
         jump_to_prev_unit()
       else
         curs:dmove(-move_amt, 0)
       end
     end
 
-    if btnp(b.right) then
-      if btns[b.o] then
+    if btnp(b_right) then
+      if btns[b_o] then
         jump_to_next_unit()
       else
         curs:dmove(move_amt, 0)
       end
     end
 
-    if btnp(b.up) then
-      if btns[b.o] then
+    if btnp(b_up) then
+      if btns[b_o] then
         jump_to_prev_unit(houses)
       else
         curs:dmove(0, -move_amt)
       end
     end
 
-    if btnp(b.down) then
-      if btns[b.o] then
+    if btnp(b_down) then
+      if btns[b_o] then
         jump_to_next_unit(houses)
       else
         curs:dmove(0, move_amt)
@@ -1819,7 +1834,7 @@ function _update()
       curs.y = flr(curs.y / 8) * 8
     end
 
-    if not pbtns[b.o] and btns[b.o] then
+    if not pbtns[b_o] and btns[b_o] then
       if cur_player and follow ~= nil then
         jump_to_next_owned()
       else
@@ -1827,7 +1842,7 @@ function _update()
       end
     end
 
-    if btnp(b.x) then
+    if btnp(b_x) then
       if state == s.command then
         make_base_menu()
 
@@ -1838,19 +1853,19 @@ function _update()
     end
 
   elseif state == s.menu then
-    if btnp(b.down) then
+    if btnp(b_down) then
       menu:down()
     end
 
-    if btnp(b.up) then
+    if btnp(b_up) then
       menu:up()
     end
 
-    if btnp(b.x) then
+    if btnp(b_x) then
       menu:call()
     end
 
-    if btnp(b.o) then
+    if btnp(b_o) then
       if menu.back ~= nil then
         menu.back()
       else
@@ -1861,24 +1876,24 @@ function _update()
     menu:update()
 
   elseif state == s.map then
-    if btnp(b.x) or btnp(b.o) then
+    if btnp(b_x) or btnp(b_o) then
       change_state("command")
     end
 
   elseif state == s.move then
-    if btnp(b.left) then
+    if btnp(b_left) then
       curs:dmove(-8, 0)
     end
 
-    if btnp(b.right) then
+    if btnp(b_right) then
       curs:dmove(8, 0)
     end
 
-    if btnp(b.up) then
+    if btnp(b_up) then
       curs:dmove(0, -8)
     end
 
-    if btnp(b.down) then
+    if btnp(b_down) then
       curs:dmove(0, 8)
     end
 
@@ -1888,7 +1903,7 @@ function _update()
       follow:set_dest(follow.x, follow.y)
     else
       curs.palette = pal_trans_red
-      if btnp(b.left) or btnp(b.right) or btnp(b.up) or btnp(b.down) then
+      if btnp(b_left) or btnp(b_right) or btnp(b_up) or btnp(b_down) then
         follow:set_dest(curs.x, curs.y)
       end
     end
@@ -1898,7 +1913,7 @@ function _update()
       follow:set_dest(follow.x, follow.y)
     end
 
-    if btnp(b.x) then
+    if btnp(b_x) then
       if curs.palette == pal_trans_red then
         curs.palette = pal_trans_red
         follow = nil
@@ -1909,7 +1924,7 @@ function _update()
       end
     end
 
-    if btnp(b.o) then
+    if btnp(b_o) then
       follow:set_dest(follow.x, follow.y)
       change_state("command")
     end
@@ -1972,10 +1987,10 @@ function _draw()
   cam:draw()
 
   if state == s.splash or state == s.win then
-    rectfill(0, 0, 128, 128, c.darkgrey)
+    rectfill(0, 0, 128, 128, c_darkgrey)
     palt()
-    palt(c.black, false)
-    palt(c.green, true)
+    palt(c_black, false)
+    palt(c_green, true)
     spr(76, 0, 96)
     spr(77, 8, 96)
     spr(78, 16, 96)
@@ -1994,52 +2009,52 @@ function _draw()
     spr(127, 24, 120)
 
     if state == s.splash then
-      print("bare wars", 47, 48, c.lightgrey)
+      print("bare wars", 47, 48, c_lightgrey)
 
       for i=min_players, max_players do
-        local col = c.lightgrey
+        local col = c_lightgrey
         if i == num_players then
           col = player_colors[i]
         end
         print(i .. "p", i * 16 - 4, 64, col)
       end
 
-      print("press \142+\151", 43, 80, c.lightgrey)
+      print("press \142+\151", 43, 80, c_lightgrey)
 
-      if btnp(b.left) then
+      if btnp(b_left) then
         num_players = max(num_players - 1, min_players)
         sfx(a.ping)
       end
 
-      if btnp(b.right) then
+      if btnp(b_right) then
         num_players = min(num_players + 1, max_players)
         sfx(a.ping)
       end
 
-      if btn(b.o) and btn(b.x) then
+      if btn(b_o) and btn(b_x) then
         init_players()
         change_state("command")
       end
 
     elseif state == s.win then
       if #order == 1 then
-        print("victory", 50, 48, c.lightgrey)
+        print("victory", 50, 48, c_lightgrey)
 
         local off_x = 64 - num_players * 8 - 10
         for i=1, num_players do
-          local col = c.indigo
+          local col = c_indigo
           if i == order[1] then
             col = player_colors[i]
           end
           print(i, i * 16 + off_x, 64, col)
         end
       else
-        print("draw", 60, 48, c.lightgrey)
+        print("draw", 60, 48, c_lightgrey)
       end
 
-      print("reset \142+\151", 43, 80, c.lightgrey)
+      print("reset \142+\151", 43, 80, c_lightgrey)
 
-      if btn(b.o) and btn(b.x) then
+      if btn(b_o) and btn(b_x) then
         run()
       end
     end
@@ -2049,11 +2064,11 @@ function _draw()
       col = player_colors[order[1]]
     end
 
-    if btn(b.x) then
+    if btn(b_x) then
       print("         \151", 43, 80, col)
     end
 
-    if btn(b.o) then
+    if btn(b_o) then
       print("      \142", 43, 80, col)
     end
 
@@ -2082,7 +2097,7 @@ function _draw()
       for x=-8, 8 do
         for y=-8, 8 do
           if can_path(mx + x, my + y) and abs(x) + abs(y) <= worker_range then
-            pset((mx + x) * 8 + 4, (my + y) * 8 + 4, c.lightgrey)
+            pset((mx + x) * 8 + 4, (my + y) * 8 + 4, c_lightgrey)
           end
         end
       end
@@ -2105,8 +2120,8 @@ function _draw()
     if state == s.move then
       -- distance tooltip
       if follow.path then
-        rectfill(curs.x + 9, curs.y, curs.x + 13, curs.y + 6, c.darkgrey)
-        print(#follow.path, curs.x + 10, curs.y + 1, c.white)
+        rectfill(curs.x + 9, curs.y, curs.x + 13, curs.y + 6, c_darkgrey)
+        print(#follow.path, curs.x + 10, curs.y + 1, c_white)
       end
     end
 
