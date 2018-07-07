@@ -33,11 +33,11 @@ with open('barewars.p8') as fp:
   for line in fp:
     rewrite.write(line)
 
-    if line.strip() == '-- AUTOGEN: castle coordinates':
-      while next(fp).strip() != '-- END AUTOGEN':
+    if line.strip() == '-- autogen: castle coordinates':
+      while next(fp).strip() != '-- end autogen':
         pass
 
-      rewrite.write(f'castle_locs = {{{", ".join(castle_locs)}}}\n-- END AUTOGEN\n')
+      rewrite.write(f'castle_locs = {{{", ".join(castle_locs)}}}\n-- end autogen\n')
 
     if line.strip() == '__map__':
       break

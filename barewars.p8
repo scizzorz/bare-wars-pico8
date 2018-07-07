@@ -4,9 +4,9 @@ __lua__
 -- bare wars
 -- by john weachock
 
--- AUTOGEN: castle coordinates
+-- autogen: castle coordinates
 castle_locs = {{25, 5}, {10, 10}, {52, 10}, {37, 13}, {46, 22}, {2, 23}, {57, 25}, {28, 27}, {20, 36}, {49, 37}, {5, 42}, {33, 42}, {59, 51}, {25, 54}, {40, 57}, {10, 58}}
--- END AUTOGEN
+-- end autogen
 
 -- buttons
 b_left = 0
