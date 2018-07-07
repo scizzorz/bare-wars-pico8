@@ -12,18 +12,33 @@ color_map = {
 
 new_map = []
 
+castle_color = (131, 118, 156)
+castle_locs = []
+
 with Image.open('map.png') as fp:
   pix = fp.load()
   w, h = fp.size
 
   for y in range(h):
-    new_map.append([])
+    if y < 32:
+      new_map.append([])
+
     for x in range(w):
       new_map[y % 32].append(color_map[pix[x, y]])
+
+      if pix[x, y] == castle_color:
+        castle_locs.append(f'{{{x}, {y}}}')
 
 with open('barewars.p8') as fp:
   for line in fp:
     rewrite.write(line)
+
+    if line.strip() == '-- AUTOGEN: castle coordinates':
+      while next(fp).strip() != '-- END AUTOGEN':
+        pass
+
+      rewrite.write(f'castle_locs = {{{", ".join(castle_locs)}}}\n-- END AUTOGEN\n')
+
     if line.strip() == '__map__':
       break
 
