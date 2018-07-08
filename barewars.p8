@@ -1861,7 +1861,8 @@ end
 frame = 0
 function _update()
   pbtns = btns
-  for i=0, #btns-1 do
+  btns = {}
+  for i=0,6 do
     btns[i] = abtn(i)
     if btns[i] then
       btnd[i] += 1
