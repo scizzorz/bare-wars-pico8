@@ -1280,6 +1280,7 @@ menu = _menu()
 follow = nil
 
 btns = {[0]=false, [1]=false, [2]=false, [3]=false, [4]=false, [5]=false}
+btnd = {[0]=0, [1]=0, [2]=0, [3]=0, [4]=0, [5]=0}
 pbtns = btns
 
 -- initialize all players
@@ -1860,7 +1861,14 @@ end
 frame = 0
 function _update()
   pbtns = btns
-  btns = {[0]=abtn(0), [1]=abtn(1), [2]=abtn(2), [3]=abtn(3), [4]=abtn(4), [5]=abtn(5)}
+  for i=0, #btns-1 do
+    btns[i] = abtn(i)
+    if btns[i] then
+      btnd[i] += 1
+    else
+      btnd[i] = 0
+    end
+  end
   frame += 1
 
   if state == s.splash or state == s.win then
@@ -1873,7 +1881,7 @@ function _update()
       move_amt = 12
     end
 
-    if abtnp(b_left) then
+    if btnd[b_left] == 1 or btnd[b_left] > 4 then
       if btns[b_o] then
         jump_to_prev_unit()
       else
@@ -1881,7 +1889,7 @@ function _update()
       end
     end
 
-    if abtnp(b_right) then
+    if btnd[b_right] == 1 or btnd[b_right] > 4 then
       if btns[b_o] then
         jump_to_next_unit()
       else
@@ -1889,7 +1897,7 @@ function _update()
       end
     end
 
-    if abtnp(b_up) then
+    if btnd[b_up] == 1 or btnd[b_up] > 4 then
       if btns[b_o] then
         jump_to_prev_unit(houses)
       else
@@ -1897,7 +1905,7 @@ function _update()
       end
     end
 
-    if abtnp(b_down) then
+    if btnd[b_down] == 1 or btnd[b_down] > 4 then
       if btns[b_o] then
         jump_to_next_unit(houses)
       else
