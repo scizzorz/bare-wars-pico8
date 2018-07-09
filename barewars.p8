@@ -2070,13 +2070,19 @@ function _update()
   if state == s.play then
     for house in all(houses) do
       house:update()
+    end
+
+    for unit in all(units) do
+      unit:update()
+    end
+
+    for house in all(houses) do
       if house.health <= 0 then
         del_house(house)
       end
     end
 
     for unit in all(units) do
-      unit:update()
       if unit.health <= 0 then
         del(units, unit)
         players[unit.owner].units -= 1
