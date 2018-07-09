@@ -631,12 +631,13 @@ end
 -- unit class
 _unit = _sprite:extend()
 
-function _unit:init(owner, x, y, palette, type)
+function _unit:init(owner, x, y, palette, type, sick)
   self.__super.init(self, 0, x, y, palette)
   self.is_unit = true
   self.owner = owner
   self.type = type or u_worker
   self.tile = an_stand[self.type]
+  self.sick = sick
 
   local stats = stats[self.type]
   self.health = stats.health
@@ -685,6 +686,7 @@ end
 function _unit:update()
   self.__super.update(self)
   self:consume()
+  self.sick = false
 
   -- movement
   local path = self.path
@@ -753,6 +755,11 @@ function _unit:draw()
   end
 
   self.__super.draw(self)
+
+  if self.sick then
+    local off = flr((frame % 30) / 10) - 2
+    pset(self.x - off, self.y - off, c_darkpurple)
+  end
 end
 
 function _unit:set_dest(tx, ty)
@@ -1537,7 +1544,7 @@ function hire_unit(unit_type, owner, x, y)
   x = x or follow.x
   y = y or (follow.y + 8)
 
-  local new = _unit(owner, x, y, races[player.race], unit_type)
+  local new = _unit(owner, x, y, races[player.race], unit_type, true)
 
   add(units, new)
   player.units += 1
@@ -1565,7 +1572,7 @@ function make_base_menu()
     if follow.is_unit then
       menu:add("move", function()
         change_state("move")
-      end)
+      end, not follow.sick)
 
       if follow.type == u_worker then
         local curs_x = flr(curs.x / 8)
