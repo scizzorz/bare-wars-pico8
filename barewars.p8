@@ -1003,27 +1003,14 @@ function _menu:draw()
   end
 end
 
--- meter class
-_meter = object:extend()
-
-function _meter:init()
-  self.x = 0
-  self.y = 0
-  self.width = 128
-  self.amt = 128
-end
-
-function _meter:fill(amt)
-  self.amt = min(128, max(0, amt))
-end
-
-function _meter:draw()
+-- turn meter
+function draw_meter()
   palt(c_black, false)
   palt(c_red, true)
 
-  local left = self.x + cam.x
-  local top = self.y + cam.y
-  local fill = self.amt / 128 * 124
+  local left = cam.x
+  local top = 120 + cam.y
+  local fill = play_timer / 128 * 124
 
   rectfill(left + 2, top + 2, left + 2 + 124, top + 6, c_darkblue)
   line(left + 2, top + 2, left + 2 + fill, top + 2, c_pink)
@@ -1279,8 +1266,6 @@ map_open = false
 cam = _camera()
 curs = _sprite(an_curs:copy(), 64, 64, pal_trans_red)
 sel_curs = _sprite(an_curs:copy(), 64, 64, pal_sel_curs)
-play_meter = _meter()
-play_meter.y = 120
 menu = _menu()
 follow = nil
 
@@ -2092,7 +2077,6 @@ function _update()
     end
 
     play_timer -= 2
-    play_meter:fill(play_timer)
     if play_timer == 0 then
       next_turn()
     end
@@ -2272,7 +2256,7 @@ function _draw()
     end
 
     if state == s.play then
-      play_meter:draw()
+      draw_meter()
     end
 
     if map_open then
