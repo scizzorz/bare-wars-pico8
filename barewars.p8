@@ -1008,15 +1008,17 @@ function draw_meter()
   palt(c_black, false)
   palt(c_red, true)
 
-  local left = cam.x
-  local top = 120 + cam.y
+  local left = cam.x + 2
+  local top = cam.y + 122
   local fill = play_timer / 128 * 124
 
-  rectfill(left + 2, top + 2, left + 2 + 124, top + 6, c_darkblue)
-  line(left + 2, top + 2, left + 2 + fill, top + 2, c_pink)
-  rect(left + 2, top + 3, left + 2 + fill, top + 4, c_red)
-  line(left + 2, top + 5, left + 2 + fill, top + 5, c_indigo)
+  rectfill(left, top, left + 124, top + 4, c_darkblue)
+  line(left, top, left + fill, top, c_pink)
+  rect(left, top + 1, left + fill, top + 2, c_red)
+  line(left, top + 3, left + fill, top + 3, c_indigo)
 
+  top -= 2
+  left -= 2
   spr(t_meter_end, left, top)
 
   for n=1, 14 do
