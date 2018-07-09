@@ -617,6 +617,17 @@ end
 
 races = {pal_race1, pal_race2, pal_race3, pal_race4}
 
+function draw_unit_healthbar(self)
+  local col = c_pink
+  for i=1,self.max_health do
+    if i > self.health then
+      col = c_darkblue
+    end
+    pset(self.x + i - 1, self.y, col)
+  end
+  pset(self.x, self.y + 6, player_colors[self.owner])
+end
+
 -- unit class
 _unit = _sprite:extend()
 
@@ -738,14 +749,7 @@ function _unit:draw()
   end
 
   if self ~= follow then
-    local col = c_pink
-    for i=1,self.max_health do
-      if i > self.health then
-        col = c_darkblue
-      end
-      pset(self.x + i - 1, self.y, col)
-    end
-    pset(self.x, self.y + 7, player_colors[self.owner])
+    draw_unit_healthbar(self)
   end
 
   self.__super.draw(self)
@@ -854,15 +858,7 @@ end
 
 function _house:draw()
   if self ~= follow and self.type ~= h_castle then
-    local col = c_pink
-    for i=1,self.max_health do
-      if i > self.health then
-        col = c_darkblue
-      end
-
-      pset(self.x + i - 1, self.y, col)
-    end
-    pset(self.x, self.y + 6, player_colors[self.owner])
+    draw_unit_healthbar(self)
   end
 
   local fill = min(flr(self.action / self.cap * 8), 7)
@@ -883,7 +879,6 @@ function _house:act()
         return
       end
     end
-  elseif self.type == h_cave then
   elseif self.type == h_farm then
     players[self.owner].food += 1
     self.action -= self.cap
