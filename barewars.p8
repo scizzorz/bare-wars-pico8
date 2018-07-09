@@ -2091,7 +2091,7 @@ function _update()
       end
     end
 
-    play_timer -= 1
+    play_timer -= 2
     play_meter:fill(play_timer)
     if play_timer == 0 then
       next_turn()
