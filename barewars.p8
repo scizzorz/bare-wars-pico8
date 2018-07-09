@@ -59,8 +59,6 @@ player_colors = {
   c_blue,   -- 2
   c_orange, -- 3
   c_pink,   -- 4
-  c_yellow, -- 5
-  c_green,  -- 6
 }
 
 -- flags
@@ -162,7 +160,6 @@ h_cave=2
 h_tower=3
 h_farm=4
 h_castle_tower=5
-h_castle_repair=6
 
 -- house costs
 hc = {
@@ -171,7 +168,6 @@ hc = {
   [h_farm]=10,
   [h_cave]=14,
   [h_castle_tower]=6,
-  [h_castle_repair]=8,
 }
 
 -- house stats
@@ -836,15 +832,7 @@ function _house:init(owner, x, y, type)
   self.my = flr(y / 8)
 
   local cell_n = mget2(self.mx, self.my)
-  if cell_n <= 75 then
-    mset2(self.mx, self.my, t_ter_wall)
-  elseif cell_n <= 91 then
-    mset2(self.mx, self.my, t_ter_wall + 16)
-  elseif cell_n <= 107 then
-    mset2(self.mx, self.my, t_ter_wall + 32)
-  elseif cell_n <= 123 then
-    mset2(self.mx, self.my, t_ter_wall + 48)
-  end
+  mset2(self.mx, self.my, t_ter_wall)
 
   for unit in all(units) do
     if mdst(unit, self) <= worker_range * 10 then
