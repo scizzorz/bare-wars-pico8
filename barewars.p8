@@ -1281,7 +1281,6 @@ follow = nil
 
 btns = {[0]=false, [1]=false, [2]=false, [3]=false, [4]=false, [5]=false}
 btnd = {[0]=0, [1]=0, [2]=0, [3]=0, [4]=0, [5]=0}
-pbtns = btns
 
 -- initialize all players
 function init_players()
@@ -1875,8 +1874,6 @@ end
 
 frame = 0
 function _update()
-  pbtns = btns
-  btns = {}
   for i=0,6 do
     btns[i] = abtn(i)
     if btns[i] then
@@ -1958,7 +1955,7 @@ function _update()
       curs.y = flr(curs.y / 8) * 8
     end
 
-    if not pbtns[b_o] and btns[b_o] then
+    if btnd[b_o] == 1 then
       if map_open then
         map_open = false
       elseif cur_player and follow ~= nil then
