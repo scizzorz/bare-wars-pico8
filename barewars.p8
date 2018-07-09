@@ -1853,6 +1853,21 @@ function del_house(house)
   end
 end
 
+function limit_cursor()
+  if curs.x < 0 then
+    curs.x = 0
+  end
+  if curs.x > map_w * 8 - 8 then
+    curs.x = map_w * 8 - 8
+  end
+  if curs.y < 0 then
+    curs.y = 0
+  end
+  if curs.y > map_h * 8 - 8 then
+    curs.y = map_h * 8 - 8
+  end
+end
+
 function _init()
   -- next_turn()
   change_state("splash")
@@ -2007,6 +2022,8 @@ function _update()
       curs:dmove(0, 8)
     end
 
+    limit_cursor()
+
     local dist = mdst(curs, sel_curs)
     if dist > worker_range * 8 then
       curs.palette = pal_bad_curs
@@ -2074,18 +2091,7 @@ function _update()
   end
 
   if state ~= s.splash and state ~= s.win then
-    if curs.x < 0 then
-      curs.x = 0
-    end
-    if curs.x > map_w * 8 - 8 then
-      curs.x = map_w * 8 - 8
-    end
-    if curs.y < 0 then
-      curs.y = 0
-    end
-    if curs.y > map_h * 8 - 8 then
-      curs.y = map_h * 8 - 8
-    end
+    limit_cursor()
 
     cam:move(curs.x - 60, curs.y - 60)
     cam:update()
