@@ -1425,6 +1425,8 @@ end
 
 -- change the state, recording the previous one as well
 function change_state(to)
+  to = to or prev_state
+
   if type(to) == "string" then
     to = s[to]
   end
@@ -1537,18 +1539,17 @@ function hire_unit(unit_type)
 
   add(units, new)
   player.units += 1
-  change_state(prev_state)
+  change_state()
 end
 
 -- build a new house
-function build_house(house_type, owner, x, y)
-  local player = players[owner]
-  local new = _house(owner, x * 8, y * 8, house_type)
+function build_house(house_type, x, y)
+  local player = players[cur_player]
+  local new = _house(cur_player, x * 8, y * 8, house_type)
 
   add(houses, new)
   player.houses += 1
-  change_state(prev_state)
-  return new
+  change_state()
 end
 
 -- make the base menu when clicking from command mode
@@ -1583,7 +1584,7 @@ function make_base_menu()
     end
   end
 
-  menu:add("map", function() change_state(prev_state) map_open = true end)
+  menu:add("map", function() change_state() map_open = true end)
   menu:add("end turn", next_turn)
 end
 
@@ -1642,7 +1643,7 @@ function make_upgrade_menu()
     end
 
     player.materials -= repair_cost
-    change_state(prev_state)
+    change_state()
   end, player.materials >= repair_cost and (follow.health < follow.max_health or follow.max_health < 8))
 
   if follow.type == h_castle then
@@ -1650,7 +1651,7 @@ function make_upgrade_menu()
       menu:add(hc[h_castle_tower] .. " add tower", function()
         follow.speed += 1
         player.materials -= hc[h_castle_tower]
-        change_state(prev_state)
+        change_state()
       end, player.materials >= hc[h_castle_tower])
 
     else
@@ -1659,7 +1660,7 @@ function make_upgrade_menu()
         menu:add(cost .. " increase speed", function()
           follow.cap /= 2
           player.materials -= cost
-          change_state(prev_state)
+          change_state()
         end, player.materials >= cost)
       end
     end
@@ -1669,7 +1670,7 @@ function make_upgrade_menu()
       menu:add(cost .. " increase speed", function()
         follow.speed = 2
         player.materials -= cost
-        change_state(prev_state)
+        change_state()
       end, player.materials >= cost)
     end
   end
