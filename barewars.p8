@@ -227,6 +227,10 @@ function mget2(x, y)
   return mget(x, y)
 end
 
+function flr8(n)
+  return flr(n / 8)
+end
+
 -- manhattan distance of two objects
 function mdst(o1, o2)
   return abs(o1.x - o2.x) + abs(o1.y - o2.y)
@@ -643,8 +647,8 @@ function _unit:init(owner, x, y, palette, type, sick)
 
   self.tx = x
   self.ty = y
-  self.ctx = flr(x / 8)
-  self.cty = flr(y / 8)
+  self.ctx = flr8(x)
+  self.cty = flr8(y)
   self.path = nil
   self.step = 0
   self.action = 0
@@ -761,8 +765,8 @@ end
 function _unit:set_dest(tx, ty)
   self.tx = tx
   self.ty = ty
-  self.ctx = flr(tx / 8)
-  self.cty = flr(ty / 8)
+  self.ctx = flr8(tx)
+  self.cty = flr8(ty)
   self.path = self:get_path()
   if #self.path > 0 then
     self.tile = an_walk[self.type]:copy()
@@ -772,8 +776,8 @@ function _unit:set_dest(tx, ty)
 end
 
 function _unit:get_path()
-  local cur_x = flr(self.x / 8)
-  local cur_y = flr(self.y / 8)
+  local cur_x = flr8(self.x)
+  local cur_y = flr8(self.y)
   return get_path(cur_x, cur_y, self.ctx, self.cty)
 end
 
@@ -828,8 +832,8 @@ function _house:init(owner, x, y, type)
   self.action = 0
   self.cap = stats.cap or 32
   self.speed = stats.speed or 1
-  self.mx = flr(x / 8)
-  self.my = flr(y / 8)
+  self.mx = flr8(x)
+  self.my = flr8(y)
 
   local cell_n = mget2(self.mx, self.my)
   mset2(self.mx, self.my, t_ter_wall)
@@ -1138,8 +1142,8 @@ function draw_info()
   palt(c_black, false)
 
   -- draw focused map info
-  local curs_x = flr(curs.x / 8)
-  local curs_y = flr(curs.y / 8)
+  local curs_x = flr8(curs.x)
+  local curs_y = flr8(curs.y)
   local cell_n = mget2(curs_x, curs_y)
   local res = get_resources(curs_x, curs_y)
 
@@ -1563,8 +1567,8 @@ function make_base_menu()
       end, not follow.sick)
 
       if follow.type == u_worker then
-        local curs_x = flr(curs.x / 8)
-        local curs_y = flr(curs.y / 8)
+        local curs_x = flr8(curs.x)
+        local curs_y = flr8(curs.y)
         menu:add("build", make_build_menu, can_build_adj(curs_x, curs_y) ~= false)
       end
 
@@ -1594,8 +1598,8 @@ function make_build_menu()
   menu:clear()
   menu.back = make_base_menu
 
-  local curs_x = flr(curs.x / 8)
-  local curs_y = flr(curs.y / 8)
+  local curs_x = flr8(curs.x)
+  local curs_y = flr8(curs.y)
   local build_x, build_y = can_build_adj(curs_x, curs_y)
 
   menu:add(hc[h_farm] .. " farm", function()
@@ -1636,7 +1640,7 @@ function make_upgrade_menu()
   menu.back = make_base_menu
 
   local cost = hc[follow.type]
-  local repair_cost = flr(cost/2)
+  local repair_cost = flr(cost / 2)
 
   local repair_text = " repair"
   if follow.max_health < 8 then
@@ -1821,8 +1825,8 @@ function del_house(house)
   end
 
   -- reset terrain to neutral
-  local cell_x = flr(house.x / 8)
-  local cell_y = flr(house.y / 8)
+  local cell_x = flr8(house.x)
+  local cell_y = flr8(house.y)
   local cell_n = mget2(cell_x, cell_y)
   if house.type == h_castle then
     mset2(cell_x, cell_y, flr(cell_n / 16) * 16 + 6)
@@ -1933,8 +1937,8 @@ function _update()
     end
 
     if follow == nil then
-      curs.x = flr(curs.x / 8) * 8
-      curs.y = flr(curs.y / 8) * 8
+      curs.x = flr8(curs.x) * 8
+      curs.y = flr8(curs.y) * 8
     end
 
     if btnd[b_o] == 1 then
@@ -2014,7 +2018,7 @@ function _update()
       end
     end
 
-    if not can_path(flr(curs.x / 8), flr(curs.y / 8)) then
+    if not can_path(flr8(curs.x), flr8(curs.y)) then
       curs.palette = pal_bad_curs
       follow:set_dest(follow.x, follow.y)
     end
@@ -2206,8 +2210,8 @@ function _draw()
 
     -- mark selectable cells
     if state == s.move then
-      local mx = flr(follow.x / 8)
-      local my = flr(follow.y / 8)
+      local mx = flr8(follow.x)
+      local my = flr8(follow.y)
       for x=-8, 8 do
         for y=-8, 8 do
           if can_path(mx + x, my + y) and abs(x) + abs(y) <= worker_range then
