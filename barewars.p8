@@ -26,6 +26,9 @@ function abtnp(i)
   return false
 end
 
+-- directions
+dirs = {{0, -1}, {1, 0}, {0, 1}, {-1, 0}}
+
 -- buttons
 b_left = 0
 b_right = 1
@@ -275,7 +278,6 @@ end
 -- pathfinding
 -- https://www.lexaloffle.com/bbs/?tid=2570
 function get_neighbors(x, y)
-  dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
   res = {}
   for d in all(dirs) do
     if can_path(x + d[1], y + d[2]) then
@@ -317,7 +319,6 @@ function can_build(x, y)
 end
 
 function can_build_adj(x, y)
-  dirs = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}}
   for dir in all(dirs) do
     if can_build(x + dir[1], y + dir[2]) then
       return x + dir[1], y + dir[2]
@@ -631,6 +632,7 @@ function _unit:update()
   self.__super.update(self)
   self:consume()
   self.sick = false
+  self.dir = nil
 
   -- movement
   local path = self.path
@@ -670,20 +672,38 @@ function _unit:update()
 
   -- perform actions
   elseif self.x == self.tx and self.y == self.ty then
-    -- this is wacky but it works
-    if self:use_resources(-1, 0) then
-    elseif self:use_resources(0, -1) then
-    elseif self:use_resources(1, 0) then
-    elseif self:use_resources(0, 1) then
-    elseif self:fight_enemy() then
+    for i=1, #dirs do
+      if self:use_resources(dirs[i][1], dirs[i][2]) then
+        self.dir = i
+        return
+      end
+    end
+
+    if self:fight_castle() then
+      return
+    end
+
+    for i=1, #dirs do
+      if self:fight_list(houses, dirs[i][1], dirs[i][2], 2) then
+        self.dir = i
+        return
+      end
+    end
+
+    for i=1, #dirs do
+      if self:fight_list(units, dirs[i][1], dirs[i][2], 1) then
+        self.dir = i
+        return
+      end
     end
   end
 end
 
 function _unit:draw()
   local path = self.path
+  local col = player_colors[self.owner]
+
   if path and #path > 0 then
-    local col = player_colors[self.owner]
     line(self.x + 4, self.y + 4, path[#path][1] * 8 + 4, path[#path][2] * 8 + 4, col)
     for coord=1,#path-1 do
       line(path[coord][1] * 8 + 4, path[coord][2] * 8 + 4, path[coord+1][1] * 8 + 4, path[coord+1][2] * 8 + 4, col)
@@ -703,6 +723,22 @@ function _unit:draw()
   if self.sick then
     local off = flr((frame % 30) / 10) - 2
     pset(self.x - off, self.y - off, c_darkpurple)
+  end
+
+  if state == s.play then
+    if self.dir == 1 then
+      pset(self.x + 3, self.y + 1, col)
+      pset(self.x + 4, self.y + 1, col)
+    elseif self.dir == 2 then
+      pset(self.x + 6, self.y + 3, col)
+      pset(self.x + 6, self.y + 4, col)
+    elseif self.dir == 3 then
+      pset(self.x + 3, self.y + 6, col)
+      pset(self.x + 4, self.y + 6, col)
+    elseif self.dir == 4 then
+      pset(self.x + 1, self.y + 3, col)
+      pset(self.x + 1, self.y + 4, col)
+    end
   end
 end
 
@@ -732,28 +768,24 @@ function _unit:use_resources(rel_x, rel_y)
     use_resource(self.ctx + rel_x, self.cty + rel_y, self.owner, count)
     return true
   end
-
-  return false
 end
 
-function _unit:fight_enemy()
-  for unit in all(units) do
-    if unit.owner ~= self.owner and mdst(unit, self) <= 8 then
-      local count = self:act(self.fight)
-      unit.health -= count
-      return
-    end
-  end
-
+function _unit:fight_castle()
   for house in all(houses) do
-    local range = 8
-    if house.type == h_castle then
-      range = 16
-    end
-    if house.owner ~= self.owner and mdst(house, self) <= range then
+    if house.type == h_castle and house.owner ~= self.owner and mdst(house, self) <= 16 then
       local count = self:act(self.fight)
       house.health -= count / 2
-      return
+      return true
+    end
+  end
+end
+
+function _unit:fight_list(list, rel_x, rel_y, factor)
+  for el in all(list) do
+    if el.owner ~= self.owner and el.x == self.x + rel_x * 8 and el.y == self.y + rel_y * 8 then
+      local count = self:act(self.fight)
+      house.health -= count / factor
+      return true
     end
   end
 end
