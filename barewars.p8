@@ -1594,10 +1594,10 @@ function make_build_menu()
 
   local build_x, build_y = can_build_adj(flr8(curs.x), flr8(curs.y))
 
-  for name, key in pairs({farm=h_farm, cave=h_cave, tower=h_tower}) do
-    local cost = hc[key]
-    menu:add(cost .. " " .. name, function()
-      build_house(key, cur_player, build_x, build_y)
+  for k in all({{"farm", h_farm}, {"cave", h_cave}, {"tower", h_tower}}) do
+    local cost = hc[k[2]]
+    menu:add(cost .. " " .. k[1], function()
+      build_house(k[2], build_x, build_y)
       player.materials -= cost
     end, player.materials >= cost)
   end
