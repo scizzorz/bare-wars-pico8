@@ -1598,24 +1598,15 @@ function make_build_menu()
   menu:clear()
   menu.back = make_base_menu
 
-  local curs_x = flr8(curs.x)
-  local curs_y = flr8(curs.y)
-  local build_x, build_y = can_build_adj(curs_x, curs_y)
+  local build_x, build_y = can_build_adj(flr8(curs.x), flr8(curs.y))
 
-  menu:add(hc[h_farm] .. " farm", function()
-    build_house(h_farm, cur_player, build_x, build_y)
-    player.materials -= hc[h_farm]
-  end, player.materials >= hc[h_farm])
-
-  menu:add(hc[h_cave] .. " cave", function()
-    build_house(h_cave, cur_player, build_x, build_y)
-    player.materials -= hc[h_cave]
-  end, player.materials >= hc[h_cave])
-
-  menu:add(hc[h_tower] .. " tower", function()
-    build_house(h_tower, cur_player, build_x, build_y)
-    player.materials -= hc[h_tower]
-  end, player.materials >= hc[h_tower])
+  for name, key in pairs({farm=h_farm, cave=h_cave, tower=h_tower}) do
+    local cost = hc[key]
+    menu:add(cost .. " " .. name, function()
+      build_house(key, cur_player, build_x, build_y)
+      player.materials -= cost
+    end, player.materials >= cost)
+  end
 end
 
 function make_hire_menu()
