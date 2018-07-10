@@ -1054,12 +1054,12 @@ function draw_info()
 
   -- draw side bar units
   for i=1, #units do
-    local top = 6 + cam.y + 4 * i
+    local top = 6 + cam.y + 5 * i
     local left = 2 + cam.x
     local unit = units[i]
 
     if follow == unit then
-      rectfill(left - 2, top - 1, left + 1, top + 2, c_darkgrey)
+      rectfill(left - 2, top - 1, left + 2, top + 2, c_darkgrey)
     end
 
     pset(left, top, player_colors[units[i].owner])
@@ -1094,11 +1094,11 @@ function draw_info()
 
   -- draw side bar houses
   for i=1, #houses do
-    local top = 6 + cam.y + 4 * i
-    local left = 6 + cam.x
+    local top = 6 + cam.y + 5 * i
+    local left = 7 + cam.x
     local house = houses[i]
     if follow == house then
-      rectfill(left - 2, top - 1, left + 1, top + 2, c_darkgrey)
+      rectfill(left - 2, top - 1, left + 2, top + 2, c_darkgrey)
     end
 
     pset(left, top, player_colors[houses[i].owner])
