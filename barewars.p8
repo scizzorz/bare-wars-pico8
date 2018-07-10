@@ -307,10 +307,10 @@ function can_path(x, y)
   return false
 end
 
-function can_build(x, y)
+function can_flag(x, y, f)
   if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget2(x, y)
-    if fget(n, f_empty) then
+    if fget(n, f) then
       return true
     end
   end
@@ -318,9 +318,21 @@ function can_build(x, y)
   return false
 end
 
-function can_build_adj(x, y)
+function can_build(x, y)
+  return can_flag(x, y, f_empty)
+end
+
+function can_food(x, y)
+  return can_flag(x, y, f_food)
+end
+
+function can_material(x, y)
+  return can_flag(x, y, f_material)
+end
+
+function can_adj(x, y, fn)
   for dir in all(dirs) do
-    if can_build(x + dir[1], y + dir[2]) then
+    if fn(x + dir[1], y + dir[2]) then
       return x + dir[1], y + dir[2]
     end
   end
@@ -1030,36 +1042,60 @@ function draw_info()
 
   -- draw side bar units
   for i=1, #units do
-    local top = 6 + cam.y + 3 * i
+    local top = 6 + cam.y + 4 * i
     local left = 2 + cam.x
     local unit = units[i]
 
     if follow == unit then
-      rectfill(left - 1, top - 1, left + 1, top + 1, c_darkgrey)
+      rectfill(left - 2, top - 1, left + 1, top + 2, c_darkgrey)
     end
 
     pset(left, top, player_colors[units[i].owner])
+    pset(left, top + 1, player_colors[units[i].owner])
 
-    if unit.x ~= unit.tx or unit.y ~= unit.ty then
-      pset(left + 1, top, c_yellow)
+    local indicator = nil
+
+    if can_adj(unit.ctx, unit.cty, can_food) then
+      indicator = c_pink
+    elseif can_adj(unit.ctx, unit.cty, can_material) then
+      indicator = c_brown
+    elseif can_adj(unit.ctx, unit.cty, can_build) then
+      indicator = c_lightgrey
+    elseif unit.x ~= unit.tx or unit.y ~= unit.ty then
+      indicator = c_yellow
+    elseif unit.sick then
+      indicator = c_darkpurple
     end
+
+    if indicator then
+      pset(left + 1, top, indicator)
+      pset(left + 1, top + 1, indicator)
+    end
+
+    pset(left - 1, top, ucol[unit.type])
+    pset(left - 1, top + 1, ucol[unit.type])
 
   end
 
   -- draw side bar houses
   for i=1, #houses do
-    local top = 6 + cam.y + 3 * i
-    local left = 5 + cam.x
+    local top = 6 + cam.y + 4 * i
+    local left = 6 + cam.x
     local house = houses[i]
     if follow == house then
-      rectfill(left - 1, top - 1, left + 1, top + 1, c_darkgrey)
+      rectfill(left - 2, top - 1, left + 1, top + 2, c_darkgrey)
     end
 
     pset(left, top, player_colors[houses[i].owner])
+    pset(left, top + 1, player_colors[houses[i].owner])
 
     if (house.action >= house.cap) and (house.type == h_cave) then
       pset(left + 1, top, c_yellow)
+      pset(left + 1, top + 1, c_yellow)
     end
+
+    pset(left - 1, top, hcol[house.type])
+    pset(left - 1, top + 1, hcol[house.type])
   end
 
   -- draw background + gems
@@ -1536,7 +1572,7 @@ function make_base_menu()
       end, not follow.sick)
 
       if follow.type == u_worker then
-        menu:add("build", make_build_menu, can_build_adj(flr8(curs.x), flr8(curs.y)) ~= false)
+        menu:add("build", make_build_menu, can_adj(flr8(curs.x), flr8(curs.y), can_build) ~= false)
       end
 
     elseif follow.is_house then
@@ -1565,7 +1601,7 @@ function make_build_menu()
   menu:clear()
   menu.back = make_base_menu
 
-  local build_x, build_y = can_build_adj(flr8(curs.x), flr8(curs.y))
+  local build_x, build_y = can_adj(flr8(curs.x), flr8(curs.y), can_build)
 
   for k in all({{"farm", h_farm}, {"cave", h_cave}, {"tower", h_tower}}) do
     local cost = hc[k[2]]
