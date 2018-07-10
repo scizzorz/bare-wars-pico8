@@ -272,31 +272,6 @@ function object:extend(proto)
 end
 
 
--- implementing mixins
-function object:implement(...)
-  for _, mixin in pairs{...} do
-    for k, v in pairs(mixin) do
-      if self[k] == nil and type(v) == "function" then
-        self[k] = v
-      end
-    end
-  end
-end
-
-
--- typechecking
-function object:isa(class)
-  local meta = getmetatable(self)
-  while meta do
-    if meta == class then
-      return true
-    end
-    meta = getmetatable(meta)
-  end
-  return false
-end
-
-
 -- pathfinding
 -- https://www.lexaloffle.com/bbs/?tid=2570
 function get_neighbors(x, y)
@@ -312,7 +287,7 @@ function get_neighbors(x, y)
 end
 
 function contains(t,v)
-  for k,val in pairs(t) do
+  for k, val in pairs(t) do
     if (val[1] == v[1] and val[2] == v[2]) then return true end
   end
 
@@ -322,8 +297,7 @@ end
 function can_path(x, y)
   if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget2(x, y)
-    local is_solid = fget(n, f_solid)
-    if not is_solid then
+    if not fget(n, f_solid) then
       return true
     end
   end
@@ -334,8 +308,7 @@ end
 function can_build(x, y)
   if x < 64 and x >= 0 and y < 64 and y >= 0 then
     local n = mget2(x, y)
-    local is_empty = fget(n, f_empty)
-    if is_empty then
+    if fget(n, f_empty) then
       return true
     end
   end
@@ -462,9 +435,6 @@ function _sprite:init(tile, x, y, palette)
   self.y = y
   self.palette = palette
   self.flipx = false
-  self.flipy = false
-  self.w = 1
-  self.h = 1
 end
 
 function _sprite:update()
@@ -485,7 +455,7 @@ function _sprite:draw()
     tile = tile:frame()
   end
 
-  spr(tile, self.x, self.y, self.w, self.h, self.flipx, self.flipy)
+  spr(tile, self.x, self.y, 1, 1, self.flipx)
 
   pal()
   palt()
@@ -504,34 +474,16 @@ end
 -- anim class
 _anim = object:extend()
 
-function _anim:init(frames, speed, loop, reverse)
+function _anim:init(frames)
   self.step = 0
   self.cur = 1
   self.frames = frames
-  self.loop = loop or true
-  self.reverse = reverse or false
-  self.speed = speed or 30
 end
 
 function _anim:next()
-  if self.reverse then
-    self.cur -= 1
-    if self.cur == 0 then
-      if self.loop then
-        self.cur = #self.frames
-      else
-        self.cur = 1
-      end
-    end
-  else
-    self.cur += 1
-    if self.cur == #self.frames + 1 then
-      if self.loop then
-        self.cur = 1
-      else
-        self.cur = #self.frames
-      end
-    end
+  self.cur += 1
+  if self.cur == #self.frames + 1 then
+    self.cur = 1
   end
 
   return self.frames[self.cur]
@@ -539,7 +491,7 @@ end
 
 function _anim:update()
   self.step += 1
-  if self.step % flr(30 / self.speed) == 0 then
+  if (self.step % 3) == 0 then
     self:next()
   end
 
@@ -551,7 +503,7 @@ function _anim:frame()
 end
 
 function _anim:copy()
-  return _anim(self.frames, self.speed, self.loop, self.reverse)
+  return _anim(self.frames)
 end
 
 -- animations
@@ -560,11 +512,11 @@ an_stand = {
   [u_warrior] = t_warrior_walk1,
 }
 an_walk = {
-  [u_worker] = _anim({t_worker_walk1, t_worker_walk2, t_worker_walk1, t_worker_walk3}, 10),
-  [u_warrior] = _anim({t_warrior_walk1, t_warrior_walk2, t_warrior_walk1, t_warrior_walk3}, 10),
+  [u_worker] = _anim({t_worker_walk1, t_worker_walk2, t_worker_walk1, t_worker_walk3}),
+  [u_warrior] = _anim({t_warrior_walk1, t_warrior_walk2, t_warrior_walk1, t_warrior_walk3}),
 }
 
-an_curs = _anim({t_curs1, t_curs2, t_curs3, t_curs4}, 10)
+an_curs = _anim({t_curs1, t_curs2, t_curs3, t_curs4})
 
 -- palettes
 function pal_trans_red()
@@ -573,8 +525,7 @@ function pal_trans_red()
 end
 
 function pal_sel_curs()
-  palt(c_red, true)
-  palt(c_black, false)
+  pal_trans_red()
   if follow then
     pal(c_black, player_colors[follow.owner])
   else
@@ -583,33 +534,26 @@ function pal_sel_curs()
 end
 
 function pal_bad_curs()
-  palt(c_red, true)
-  palt(c_black, false)
+  pal_trans_red()
   pal(c_black, c_darkpurple)
 end
 
-function pal_race1()
-  palt(c_red, true)
-  palt(c_black, false)
-end
+pal_race1 = pal_trans_red
 
 function pal_race2()
-  palt(c_red, true)
-  palt(c_black, false)
+  pal_trans_red()
   pal(c_brown, c_darkblue)
   pal(c_orange, c_brown)
 end
 
 function pal_race3()
-  palt(c_red, true)
-  palt(c_black, false)
+  pal_trans_red()
   pal(c_brown, c_white)
   pal(c_orange, c_blue)
 end
 
 function pal_race4()
-  palt(c_red, true)
-  palt(c_black, false)
+  pal_trans_red()
   pal(c_black, c_lightgrey)
   pal(c_brown, c_white)
   pal(c_orange, c_darkgrey)
@@ -619,7 +563,7 @@ races = {pal_race1, pal_race2, pal_race3, pal_race4}
 
 function draw_unit_healthbar(self)
   local col = c_pink
-  for i=1,self.max_health do
+  for i=1, self.max_health do
     if i > self.health then
       col = c_darkblue
     end
@@ -1316,7 +1260,7 @@ function jump_to_closest_unit()
     local unit_dist = mdst(unit, curs)
 
     -- check if this unit is closer
-    if unit_dist < closest_dist or use_next then
+    if unit_dist < closest_dist then
       closest_dist = unit_dist
       closest_unit = unit
     end
@@ -1339,10 +1283,8 @@ function jump_to_next_unit(list)
   list = list or units
   local i = 0
   for unit in all(list) do
-    local unit_dist = mdst(unit, curs)
     i += 1
-
-    if unit_dist == 0 then
+    if unit == follow then
       break
     end
   end
@@ -1365,10 +1307,8 @@ function jump_to_prev_unit(list)
   -- find the unit we're selecting
   local i = 0
   for unit in all(list) do
-    local unit_dist = mdst(unit, curs)
     i += 1
-
-    if unit_dist == 0 then
+    if unit == follow then
       break
     end
   end
