@@ -330,6 +330,18 @@ function can_material(x, y)
   return can_flag(x, y, f_material)
 end
 
+function can_fight_list(list, as)
+  for el in all(list) do
+    if el.owner ~= as.owner and (abs(as.ctx - el.ctx) + abs(as.cty - el.cty)) <= 1 then
+      return el.owner
+    end
+  end
+end
+
+function can_fight(as)
+  return can_fight_list(houses, as) or can_fight_list(units, as)
+end
+
 function can_adj(x, y, fn)
   for dir in all(dirs) do
     if fn(x + dir[1], y + dir[2]) then
@@ -820,11 +832,11 @@ function _house:init(owner, x, y, type)
   self.action = 0
   self.cap = stats.cap or 32
   self.speed = stats.speed or 1
-  self.mx = flr8(x)
-  self.my = flr8(y)
+  self.ctx = flr8(x)
+  self.cty = flr8(y)
 
-  local cell_n = mget2(self.mx, self.my)
-  mset2(self.mx, self.my, t_ter_wall)
+  local cell_n = mget2(self.ctx, self.cty)
+  mset2(self.ctx, self.cty, t_ter_wall)
 
   for unit in all(units) do
     if mdst(unit, self) <= worker_range * 10 then
@@ -1055,10 +1067,13 @@ function draw_info()
 
     local indicator = nil
 
+    local fight = can_fight(unit)
     if can_adj(unit.ctx, unit.cty, can_food) then
       indicator = c_pink
     elseif can_adj(unit.ctx, unit.cty, can_material) then
       indicator = c_brown
+    elseif fight then
+      indicator = player_colors[fight]
     elseif can_adj(unit.ctx, unit.cty, can_build) then
       indicator = c_lightgrey
     elseif unit.x ~= unit.tx or unit.y ~= unit.ty then
