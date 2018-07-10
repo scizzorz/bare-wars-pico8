@@ -1530,18 +1530,14 @@ function get_resources(x, y)
 end
 
 -- hire a new unit
-function hire_unit(unit_type, owner, x, y)
-  owner = owner or cur_player
-  local player = players[owner]
-  x = x or follow.x
-  y = y or (follow.y + 8)
+function hire_unit(unit_type)
+  local player = players[cur_player]
 
-  local new = _unit(owner, x, y, races[player.race], unit_type, true)
+  local new = _unit(cur_player, follow.x, follow.y + 8, races[player.race], unit_type, true)
 
   add(units, new)
   player.units += 1
   change_state(prev_state)
-  return new
 end
 
 -- build a new house
@@ -1567,9 +1563,7 @@ function make_base_menu()
       end, not follow.sick)
 
       if follow.type == u_worker then
-        local curs_x = flr8(curs.x)
-        local curs_y = flr8(curs.y)
-        menu:add("build", make_build_menu, can_build_adj(curs_x, curs_y) ~= false)
+        menu:add("build", make_build_menu, can_build_adj(flr8(curs.x), flr8(curs.y)) ~= false)
       end
 
     elseif follow.is_house then
