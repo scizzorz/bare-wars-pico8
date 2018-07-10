@@ -1523,7 +1523,7 @@ function get_resources(x, y)
   local is_resource = fget(cell, f_food) or fget(cell, f_material)
   local key = coord_key(x, y)
   if is_resource and resources[key] == nil then
-    resources[key] = flr(rnd(24) + 8)
+    resources[key] = flr(rnd(16) + 16)
   end
 
   return resources[key]
