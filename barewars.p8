@@ -808,7 +808,7 @@ function _unit:fight_list(list, rel_x, rel_y, factor)
   for el in all(list) do
     if el.owner ~= self.owner and el.x == self.x + rel_x * 8 and el.y == self.y + rel_y * 8 then
       local count = self:act(self.fight)
-      house.health -= count / factor
+      el.health -= count / factor
       return true
     end
   end
